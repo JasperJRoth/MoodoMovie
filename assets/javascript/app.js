@@ -3,7 +3,7 @@
  * Params:  => movieTitle: the full title of the movie
  *          => elementId: the ID of the DOM image element (<img>)
  * 
- * This is an asyncronous function, so make sure that the element is already created in the DOM!
+ * This is an asynchronous function, so make sure that the element is already created in the DOM!
  * **/
 function moviePoster(movieTitle, elementId){
     
@@ -27,7 +27,6 @@ function moviePoster(movieTitle, elementId){
         }
         else{
             $img.attr("src",result.Poster);
-            console.log(result.Poster);
         }
     });
 }
