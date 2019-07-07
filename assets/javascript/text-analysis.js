@@ -1,4 +1,4 @@
-var testString = nlp("I'm looking for a movie that is sad but also heartwarming and sweet and will make me cry. Something I can watch with my kids but with dialogue.")
+var testString = "I'm looking for a movie that is sad but also heartwarming and sweet and will make me cry. Something I can watch with my kids but with dialogue."
 
 var testReview = `You can judge the quality of each successive instalment of the petrolhead Fast & Furious franchise by its opening action sequence. Here, the action revs up with a car chase around the streets of Havana. One of the first Hollywood movies to shoot in Cuba, F&F8 effectively uses one of the most photogenic cities on Earth as a display cabinet for vintage hotrods and buttocks. The race is between a turbo-boosted Cuban loan shark and Dom Toretto (Vin Diesel) in a disintegrating clown car. Powered by distilled testosterone alone, Dom wins the race, driving backwards, consumed in a fireball, without brakes. The writing is scorched into the tarmac: this episode is aiming for new levels of high-octane silliness.
 
@@ -50,52 +50,145 @@ We have recently read much about Alzheimer's because of the death of Ronald Reag
 
 Well, it's nice to think so. Nice to believe the window can open once more before closing forever.`
 
-var textParsed = {
-    people: testString.people().out("array"),
-    adjectives: testString.adjectives().out("array"),
-    places: testString.places().out("array"),
-}
+var apiKey = "c07a02e77846bc61b3a6ece1fabeeee2"
+var notebookID = "11036"
 
-var adjectiveArray = []
-
-for (let adjective of textParsed.adjectives) {
-    adjectiveArray.push([adjective, 2])
-    var maxscore
-    $.ajax({
-        url: "http://api.datamuse.com/words?ml="+adjective+"&topics=movie",
-        method: "GET"
-    }).then(function(response) {
-        for (let i = 0; i < response.length; i++) {
-            let item = response[i]
-            if (i === 0) {
-                maxscore = item.score
-            }
-            let score = item.score/maxscore
-            if (score > 0) {
-                adjectiveArray.push([item.word, score])
+var TextAnalysis = {
+    parseText(string) {
+        let textObject = nlp(string);
+        let parsedTextObject = {
+            people: textObject.people().out("array"),
+            adjectives: textObject.adjectives().out("array"),
+            places: textObject.places().out("array"),
+            nouns: textObject.nouns().out("array")
+        }
+        console.log(parsedTextObject)
+        return parsedTextObject;
+    },
+    getSimilarWords(inputWordArray) {
+        var outputWordArray = [];
+        for (let word of inputWordArray) {
+            outputWordArray.push([word, 2])
+            var maxscore
+            $.ajax({
+                url: "http://api.datamuse.com/words?ml="+word+"&topics=movie",
+                method: "GET"
+            }).then(function(response) {
+                for (let i = 0; i < response.length; i++) {
+                    let item = response[i]
+                    if (i === 0) {
+                        maxscore = item.score
+                    }
+                    let score = item.score/maxscore
+                    if (score > 0) {
+                        outputWordArray.push([item.word, score])
+                    }
+                }
+            })
+        }
+        console.log(outputWordArray)
+        return outputWordArray;
+    },
+    scoreStringByWordArray(string, wordArray) {
+        var score = 0;
+        for (let word of wordArray) {
+            let wordRegEx = new RegExp(word[0], "g");
+            let count = (string.match(wordRegEx) || []).length;
+            score += count * word[1];
+        }
+        score = score / (string.split(" ").length)
+        console.log(score)
+        return score;
+    },
+    scoreStringByString(string, stringToScore, isScoringNouns, isScoringAdjectives) {
+        let parsedTextObject = this.parseText(string);
+        let inputWordArray = [];
+        if (isScoringNouns) {
+            for (let noun of parsedTextObject.nouns) {
+                inputWordArray.push(noun);
             }
         }
-    })
+        if (isScoringAdjectives) {
+            for (let adjective of parsedTextObject.adjectives) {
+                inputWordArray.push(adjective);
+            }
+        }
+        let wordArray = this.getSimilarWords(inputWordArray);
+        let score = this.scoreStringByWordArray(stringToScore, wordArray);
+        return score;
+    },
+    scoreWordArrayByWordArray(wordArrayOne, wordArrayTwo) {
+        let wordsOne = [];
+        let scoresOne = [];
+        let wordsTwo = [];
+        let scoresTwo = [];
+        var score = 0;
+        for (let wordDuo of wordArrayOne) {
+            wordsOne.push(wordDuo[0]);
+            scoresOne.push(wordDuo[1]);
+        }
+        for (let wordDuo of wordArrayTwo) {
+            wordsTwo.push(wordDuo[0]);
+            scoresTwo.push(wordDuo[1]);
+        }
+        for (let oneIndex = 0; oneIndex < wordsOne.length; oneIndex++) {
+            let twoIndex = wordsTwo.indexOf(wordsOne[oneIndex]);
+            if (twoIndex > -1) {
+                score = score + scoresOne[oneIndex] + scoresTwo[twoIndex]
+                wordsTwo.splice(twoIndex, 1);
+                scoresTwo.splice(twoIndex, 1);
+            }
+        }
+        for (let twoIndex = 0; twoIndex < wordsOne.length; twoIndex++) {
+            let oneIndex = wordsOne.indexOf(wordsTwo[twoIndex]);
+            if (oneIndex > -1) {
+                score = score + scoresOne[oneIndex] + scoresTwo[twoIndex]
+                wordsOne.splice(oneIndex, 1);
+                scoresOne.splice(oneIndex, 1);
+            }
+        }
+        return score;
+    }
 }
 
+function getReviews(movieID) {
+    var reviews = []
+    var settings = {
+        "url": "https://api.themoviedb.org/3/movie/" + movieID + "/reviews?page=1&language=en-US&api_key=" + apiKey,
+        "method": "GET",
+      }  
+    $.ajax(settings).done(function (response) {
+        let results = response.results;
+        for (let result of results) {
+            reviews.push(result.content)
+        }
+    });
+    console.log(reviews)
+    return reviews
+}
+
+function getKeywords(movieID) {
+    var keywords = []
+    var settings = {
+        "url": "https://api.themoviedb.org/3/movie/" + movieID + "/keywords?api_key=" + apiKey,
+        "method": "GET",
+      }  
+    $.ajax(settings).done(function (response) {
+        let results = response.keywords;
+        for (let result of results) {
+            keywords.push(result.name)
+        }
+    });
+    console.log(keywords)
+    return keywords
+}
+
+let notebookKeywords = getKeywords("297761")
 setTimeout(function() {
-    console.log(adjectiveArray)
-    var score = 0;
-    var score2 = 0;
-    var score3 = 0;
-    for (let adjective of adjectiveArray) {
-        let adjectiveRegEx = new RegExp(adjective[0], "g");
-        let count = (testReview.match(adjectiveRegEx) || []).length;
-        let count2 = (testReview2.match(adjectiveRegEx) || []).length;
-        let count3 = (testReview3.match(adjectiveRegEx) || []).length;
-        score += count * adjective[1];
-        score2 += count2 * adjective[1];
-        score3 += count3 * adjective[1];
-    }
-    score = score / (testReview.split(" ").length)
-    score2 = score2 / (testReview2.split(" ").length)
-    score3 = score3 / (testReview3.split(" ").length)
-    console.log(score)
-    console.log(score2)
-    console.log(score3)
+    let wordArrayOne = TextAnalysis.getSimilarWords(notebookKeywords);
+    let wordArrayTwo = TextAnalysis.getSimilarWords(TextAnalysis.parseText(testString).adjectives)
+    setTimeout(function() {
+        console.log(TextAnalysis.scoreWordArrayByWordArray(wordArrayOne, wordArrayTwo))
+    }, 1000)
 }, 1000)
+
