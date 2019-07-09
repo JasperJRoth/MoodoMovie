@@ -148,7 +148,7 @@ var TMDB = {
     }
 }
 
-async function isThorSad() {
+async function checkAMovie() {
     let movieID = await TMDB.getMovieID("High School Musical", 2006);
     let keywordsRaw = await TMDB.getKeywords(movieID);
     let keywords = TextAnalysis.parseKeywords(keywordsRaw);
@@ -159,5 +159,3 @@ async function isThorSad() {
     let wordArrayTwo = await TextAnalysis.getSimilarWords(input)
     console.log(TextAnalysis.scoreWordArrayByWordArray(wordArrayOne, wordArrayTwo))
 }
-
-isThorSad()
