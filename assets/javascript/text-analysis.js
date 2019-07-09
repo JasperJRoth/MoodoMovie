@@ -24,7 +24,7 @@ var TextAnalysis = {
                 outputWordArray.push([word, 2])
                 var maxscore
                 $.ajax({
-                    url: "http://api.datamuse.com/words?ml="+word+"&topics=movie",
+                    url: "https://api.datamuse.com/words?ml="+word+"&topics=movie",
                     method: "GET"
                 }).then(function(response) {
                     for (let i = 0; i < response.length; i++) {
