@@ -13,16 +13,18 @@ var moviesSearched; //stores info for all the movies searched
  * Render the details of the movie clicked by the user
  */
 function renderMovieDetails(){
-    var movieId = $(this).attr("data-imdbid");
+    var movieId = $(this).attr("id");
     var movie;
     
     for(var i=0; i < moviesSearched.length; i++) {
-        if(moviesSearched[i].imbdID === movieId){
+        if(moviesSearched[i].imdbID === movieId){
             movie = moviesSearched[i];
             break;
         }
     }
 
+    $("#movies").children('img').removeClass("movie-selected");
+    $(this).addClass("movie-selected");
     $movieDetail.empty();
 
     $movieDetail.append($("<h3>").text(movie.Title));
@@ -33,6 +35,7 @@ function renderMovieDetails(){
     $movieDetail.append($("<p>").text(`Director: ${movie.Director}`));
     $movieDetail.append($("<p>").text(movie.Plot));
     
+    $movieDetail.css("display","block");
 }
 
 /** 
@@ -40,23 +43,12 @@ function renderMovieDetails(){
  * Params:  => movie: OMDB API result object with the movie info
  * **/
 function renderMovie(movie){
-    //var defaultImg = "assets/images/poster-default.png";
-
-    var $figure = $("<figure>");
-
-    var $caption = $("<figcaption>");
-    $caption.text(movie.Title);
-
     var $img = $("<img>");
     $img.attr("src",movie.Poster);
-    $img.attr("data-imdbid",movie.imbdID);
+    $img.attr("id",movie.imdbID);
     $img.click(renderMovieDetails);
 
-    $figure.append($caption);
-    $figure.append($img);
-
-    $movies.append($figure);
-
+    $movies.append($img);
 }
 
 /** 
@@ -85,7 +77,7 @@ function getMoviesInfo(movies){
                 console.log(result.Error);
             }
             else{
-                console.log(result);
+                //console.log(result);
                 moviesSearched.push(result);
                 renderMovie(result);
             }
@@ -117,4 +109,4 @@ firebase.auth().onAuthStateChanged(function(user) {
 
 
 //THIS IS TEST DATA - MUST BE REMOVED AFTER THE SEARCH IS WORKING
-console.log(getMoviesInfo([{title: "Matrix", year: "1999"},{title: "Tomb Raider", year: "2018"},{title: "Superman", year: "2018"}]));
+getMoviesInfo([{title: "Matrix", year: "1999"},{title: "Tomb Raider", year: "2018"},{title: "Superman", year: "2018"}]);
