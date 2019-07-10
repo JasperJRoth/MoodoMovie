@@ -19,22 +19,29 @@ const siteAuth = {
     });
   },
   signUp: function(email, pass){
-    firebase.auth().createUserWithEmailAndPassword(email, pass).catch(function(error) {
-      throw new Error(`Error ${error.errorCode}: ${error.message}`);
+    console.log(email);
+    firebase.auth().createUserWithEmailAndPassword(email, pass).then(function(){
+      M.toast({html: "Signed up successfully!"});
+    }).catch(function(error) {
+      M.toast({html: `Sign up failed. Error ${error.errorCode}: ${error.message}`});
     });
   },
   signIn: function(method, email, pass){
     switch(method){
       case "email":
-          firebase.auth().signInWithEmailAndPassword(email, pass).catch(function(error) {
-            throw new Error(`Error ${error.errorCode}: ${error.message}`);
+          firebase.auth().signInWithEmailAndPassword(email, pass).then(function(){
+            M.toast({html: "Signed in successfully!"});
+          }).catch(function(error) {
+            M.toast({html: `Sign in failed. Error ${error.errorCode}: ${error.message}`});
           });
         return;
       case "google":
         var provider = new firebase.auth.GoogleAuthProvider();
 
-        firebase.auth().signInWithPopup(provider).catch(function(error) {
-          throw new Error(`Error ${error.errorCode}: ${error.message}`);
+        firebase.auth().signInWithPopup(provider).then(function(){
+          M.toast({html: "Signed in successfully!"});
+        }).catch(function(error) {
+          M.toast({html: `Sign in failed. Error ${error.errorCode}: ${error.message}`});
         });
         return;
     }
@@ -43,6 +50,8 @@ const siteAuth = {
     return firebase.auth().currentUser;
   },
   signOut: function(){
-    firebase.auth().signOut();
+    firebase.auth().signOut().then(function(){
+      M.toast({html: "Signed Out."});
+    });
   }
 }
