@@ -15,6 +15,10 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
+        <!-- Materialise references -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
         <!-- Firebase references -->
         <script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-database.js"></script>
@@ -24,17 +28,40 @@
         <!-- Fontawesome -->
         <script src="https://kit.fontawesome.com/113cd923d0.js"></script>    
 
+        <!-- material-icons -->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+        <!-- Font -->
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Slab&display=swap" rel="stylesheet">
+
         <!-- Compromise reference -->
         <script src="https://unpkg.com/compromise@latest/builds/compromise.min.js"></script>
 
     </head>
-    <body>
-        <header>
+    <body class="purple darken-4">
+        <nav>
+            <div class="nav-wrapper row indigo darken-2">
+                <a class="brand-logo col s3 center-align grey-text text-lighten-3">MoodoMovie</a>
+                <div class="col offset-s9 s3">
+                    <a class="left grey-text text-lighten-3">Log In/Sign up</a>
+                    <a class="right grey-text text-lighten-3">Sign In With Google</a>
+                </div>
+                
+            </div>
+        </nav>
 
-        </header>
-
-        <main>
-
+        <main class="container">
+            <div class="card red lighten-2">
+                <div class="card-content ">
+                    <div class="input-field">
+                        <i class="material-icons prefix">search</i>
+                        <input id="icon_prefix" type="text" class="grey-text text-darken-4">
+                        <label for="icon_prefix" class="grey-text text-darken-4">Search Movies</label>
+                    </div>
+                </div>
+            </div>
+            <div id="movies"></div>
+            <div id="movie-detail"></div>
         </main>
 
         <footer>
@@ -46,5 +73,7 @@
         <script src="assets/javascript/auth.js"></script>
         <script src="assets/javascript/text-analysis.js"></script>
         <script src="assets/javascript/app.js"></script>
+
+        <link rel="stylesheet" href="assets/css/theme.css">
     </body>
 </html>
