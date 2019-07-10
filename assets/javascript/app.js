@@ -88,7 +88,29 @@ function getMoviesInfo(movies){
 
 //show the sign in screen so the user can authenticate
 function showSignIn(){
-    console.log("user should be authenticated. Show the authentication form!")
+    hideSignUp();
+    $("#loginForm").css("display", "block");
+}
+
+function hideSignIn(){
+    $("#loginForm").css("display", "none");
+}
+
+function showSignUp(){
+    hideSignIn();
+    $("#signupForm").css("display", "block");
+}
+
+function hideSignUp(){
+    $("#signupForm").css("display", "none");
+}
+
+function showSignUpButton(){
+    $("#signUp").css("display", "inline-block");
+}
+
+function hideSignUpButton(){
+    $("#signUp").css("display", "none");
 }
 
 //show the things that user is able to do once it is authenticated
@@ -99,14 +121,50 @@ function app(user){
 //checks if the user is authenticated
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
-        //show the things that user can do when it's autheticated
-        app(user); 
+        $("#signInOut").text("Sign Out");
+        hideSignUpButton();
     } else {
-        //send the user to the authentication form
-        showSignIn(); //method should be created
+        $("#signInOut").text("Log In");
+        showSignUpButton();
     }
 });
 
 
 //THIS IS TEST DATA - MUST BE REMOVED AFTER THE SEARCH IS WORKING
 getMoviesInfo([{title: "Matrix", year: "1999"},{title: "Tomb Raider", year: "2018"},{title: "Superman", year: "2018"}]);
+
+$(document).ready(function(){
+    $("#signInOut").on("click", function(event){
+        if(siteAuth.activeUser()){
+            hideSignIn()
+            siteAuth.signOut();
+        }else{
+            showSignIn();
+        }
+    });
+
+    $("#signUp").on("click", function(event){
+        showSignUp();
+    });
+
+    $("#googleSignIn").on("click", function(event){
+        hideSignIn()
+        siteAuth.signIn("google");
+    });
+
+    $("#loginSubmit").on("click", function(){
+        var email = $("#loginEmail").val();
+        var pass = $("#loginPass").val();
+        
+        hideSignIn()
+        siteAuth.signIn("email", email, pass);
+    });
+
+    $("#signupSubmit").on("click", function(){
+        var email = $("#signupEmail").val();
+        var pass = $("#signupPass").val();
+        
+        hideSignUp()
+        siteAuth.signUp(email, pass);
+    });
+});
