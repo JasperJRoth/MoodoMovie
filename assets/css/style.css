@@ -7,13 +7,23 @@
 }
 
 #movies img{
-    width: 300px;
+    width: 100%;
     cursor: pointer;
-    height: 450px;
     overflow: hidden;
 }
+
+#movies img:hover{
+    filter: brightness(50%);
+}
+
+.dp-btn:hover {
+    filter: brightness(50%) !important;
+    cursor: pointer;
+}
+
 #movies .card{
-    width: 300px;
+    width: 30%;
+    min-width: 200px;
     margin: 5px;
 }
 
@@ -33,4 +43,41 @@
 
 #search-button{
     cursor: pointer;
+}
+
+#search-box {
+    background-color: #eeeeee;
+}
+
+p {
+    margin-bottom: 5px !important;
+}
+
+.dp-navbar {
+    display: grid;
+    grid-template-columns: 10% 40% 40% 10%;
+    width: 100vw;
+    margin-bottom: 20px;
+}
+
+.dp-btn {
+    width: 150px;
+    height: 40px;
+    margin: auto 5px;
+    text-align: center;
+    padding: 13px 0px;
+    border-radius: 5px;
+}
+
+.dp-brand-name {
+    font-size: 30px;
+    grid-column: 2 / 3;
+    color: #eeeeee;
+}
+
+#buttons-div {
+    grid-column: 3 / 4;
+    display: flex;
+    align-content: center;
+    justify-content: flex-end;
 }
