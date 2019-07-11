@@ -5,6 +5,7 @@
         <meta charset="utf-8">
 
         <title>MoodoMovie</title>
+        
 
         <link rel="stylesheet" href="assets/css/reset.css">
 
@@ -12,8 +13,12 @@
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
         <!-- Bootstrap references -->
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+        <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script> -->
+
+        <!-- Materialise references -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
         <!-- Firebase references -->
         <script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-app.js"></script>
@@ -22,19 +27,92 @@
         <script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-functions.js"></script>
         
         <!-- Fontawesome -->
-        <script src="https://kit.fontawesome.com/113cd923d0.js"></script>    
+        <!-- <script src="https://kit.fontawesome.com/113cd923d0.js"></script>     -->
+
+        <!-- material-icons -->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+        <!-- Font -->
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Slab&display=swap" rel="stylesheet">
 
         <!-- Compromise reference -->
         <script src="https://unpkg.com/compromise@latest/builds/compromise.min.js"></script>
 
+        <!-- Custom css -->
+        <link rel="stylesheet" href="assets/css/theme.css">
+        <link rel="stylesheet" href="assets/css/style.css">
+        <link rel="stylesheet" href="assets/css/utility.css">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
     </head>
-    <body>
-        <header>
+    <body class="purple darken-1">
+        <nav>
+            <div class="nav-wrapper row indigo darken-2">
+                <a class="brand-logo col s3 center-align grey-text text-lighten-3">MoodoMovie</a>
+                <div class="col offset-s6 s6 row">
+                    <a class="grey-text text-lighten-3 waves-effect waves-light btn col s3 noFloat" id="signInOut">Log In</a>
+                    <a class="grey-text text-lighten-3 waves-effect waves-light btn col s3 offset-s1 noFloat" id="signUp">Sign Up</a>
+                    <a class="grey-text text-lighten-3 waves-effect waves-light btn col s3 offset-s1 noFloat" id="googleSignIn">Sign In With Google</a>
+                </div>
+                
+            </div>
+        </nav>
 
-        </header>
-
-        <main>
-
+        <main class="container">
+            <div class="card red lighten-2">
+                <div class="card-content ">
+                    <div class="input-field">
+                        <i class="material-icons prefix">search</i>
+                        <input id="icon_prefix" type="text" class="grey-text text-darken-4">
+                        <label for="icon_prefix" class="grey-text text-darken-4">Search Movies</label>
+                    </div>
+                </div>
+            </div>
+            <div id="loginForm" class="card" style="display: none;">
+                <div class="card-content">
+                    <div class="section">
+                        <h5>Log In</h5>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="input-field">
+                        <i class="material-icons prefix">account_circle</i>
+                        <input id="loginEmail" type="email">
+                        <label for="loginEmail">E-mail</label>
+                    </div>
+                    <div class="input-field">
+                        <i class="material-icons prefix">lock</i>
+                        <input id="loginPass" type="password">
+                        <label for="loginPass">Password</label>
+                    </div>
+                    <div class="row">
+                        <a class="waves-effect waves-light btn col s2 offset-s1" id="loginSubmit">Log In</a>
+                    </div>
+                </div>
+            </div>
+            <div id="signupForm" class="card" style="display: none;">
+                <div class="card-content">
+                    <div class="section">
+                        <h5>Sign Up</h5>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="input-field">
+                        <i class="material-icons prefix">account_circle</i>
+                        <input id="signupEmail" type="email">
+                        <label for="signupEmail">E-mail</label>
+                    </div>
+                    <div class="input-field">
+                        <i class="material-icons prefix">lock</i>
+                        <input id="signupPass" type="password">
+                        <label for="signupPass">Password</label>
+                    </div>
+                    <div class="row">
+                        <a class="waves-effect waves-light btn col s2 offset-s1" id="signupSubmit">Sign Up</a>
+                    </div>
+                </div>
+            </div>
+            <div id="movies"></div>
+            <div id="movie-detail"></div>
         </main>
 
         <footer>
@@ -46,5 +124,7 @@
         <script src="assets/javascript/auth.js"></script>
         <script src="assets/javascript/text-analysis.js"></script>
         <script src="assets/javascript/app.js"></script>
+
+        
     </body>
 </html>

@@ -1,26 +1,5 @@
 
-var provider = new firebase.auth.GoogleAuthProvider();
-
 const siteAuth = {
-  signIn: function(){
-    firebase.auth().signInWithPopup(provider).then(function(result) {
-        // The signed-in user info.
-        var user = result.user;
-  
-        console.log(`Signed in successfully as: ${user.email}`);
-      }).catch(function(error) {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // The email of the user's account used.
-        var email = error.email;
-        // The firebase.auth.AuthCredential type that was used.
-        var credential = error.credential;
-  
-        console(`Login failed with user: ${email} on auth provider ${credential}`);
-        console.log(`Error ${errorCode}: ${errorMessage}`);
-      });
-  },
   getUserData: async function(){
     var sendCall = firebase.functions().httpsCallable("getUserData");
   
@@ -37,6 +16,42 @@ const siteAuth = {
       console.log(`Successfully stored data`);
     }).catch(function(error) {
       throw new Error(`Error ${error.errorCode}: ${error.message}`);
+    });
+  },
+  signUp: function(email, pass){
+    console.log(email);
+    firebase.auth().createUserWithEmailAndPassword(email, pass).then(function(){
+      M.toast({html: "Signed up successfully!"});
+    }).catch(function(error) {
+      M.toast({html: `Sign up failed. Error ${error.errorCode}: ${error.message}`});
+    });
+  },
+  signIn: function(method, email, pass){
+    switch(method){
+      case "email":
+          firebase.auth().signInWithEmailAndPassword(email, pass).then(function(){
+            M.toast({html: "Signed in successfully!"});
+          }).catch(function(error) {
+            M.toast({html: `Sign in failed. Error ${error.errorCode}: ${error.message}`});
+          });
+        return;
+      case "google":
+        var provider = new firebase.auth.GoogleAuthProvider();
+
+        firebase.auth().signInWithPopup(provider).then(function(){
+          M.toast({html: "Signed in successfully!"});
+        }).catch(function(error) {
+          M.toast({html: `Sign in failed. Error ${error.errorCode}: ${error.message}`});
+        });
+        return;
+    }
+  },
+  activeUser: function(){
+    return firebase.auth().currentUser;
+  },
+  signOut: function(){
+    firebase.auth().signOut().then(function(){
+      M.toast({html: "Signed Out."});
     });
   }
 }
