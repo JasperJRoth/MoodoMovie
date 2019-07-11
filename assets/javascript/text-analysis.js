@@ -1,10 +1,3 @@
-var testString = "I want a movie about a group of unlikely friends singing in high school"
-
-var testString2 = "I'm looking for a very action heavy fighting movie with fast cars and with big punches and strong criminals looking angry specifically in New Mexico."
-
-var apiKey = "c07a02e77846bc61b3a6ece1fabeeee2"
-var notebookID = "11036"
-
 var TextAnalysis = {
     parseText(string) {
         let textObject = nlp(string);
@@ -116,46 +109,65 @@ var TextAnalysis = {
 
 var TMDB = {
     getKeywords(movieID) {
-        return new Promise(function(resolve, reject) {
-            var keywords = []
-            var settings = {
-                "url": "https://api.themoviedb.org/3/movie/" + movieID + "/keywords?api_key=" + apiKey,
-                "method": "GET",
-              }  
-            $.ajax(settings).done(function (response) {
-                let results = response.keywords;
-                for (let result of results) {
-                    keywords.push(result.name)
-                }
+        return new Promise(async function(resolve, reject) {
+            let data = JSON.stringify({id: movieID});
+            let sendCall = firebase.functions().httpsCallable("getKeywords");
+            let keywords
+            sendCall(data).then(function(result) {
+                keywords = result.data
                 console.log(keywords)
-                resolve(keywords)
+                resolve(keywords);
             });
         })
-        },
+    },
     getMovieID(movieTitle, movieYear) {
-        return new Promise(function(resolve, reject) {
-            $.ajax({
-                "url": "https://api.themoviedb.org/3/search/movie?api_key=" + apiKey + "&language=en-US&query=" + movieTitle + "&page=1&include_adult=false&year=" + movieYear,
-                "method": "GET"
-            }).done(function(response) {
-                console.log(response)
-                let results = response.results;
-                let firstResult = results[0];
-                console.log(firstResult.id)
-                resolve(firstResult.id);
-            })
+        return new Promise(function (resolve, reject) {
+            let data = JSON.stringify({ title: movieTitle, year: movieYear });
+            let sendCall = firebase.functions().httpsCallable("getMovieID");
+            let movieID
+            sendCall(data).then(function (result) {
+                movieID = result.data
+                console.log(movieID)
+                resolve(movieID);
+            });
+        })
+    },
+    getMoviesByGenre: async function(genreID) {
+        return new Promise(function (resolve, reject) {
+            let titles = [];
+            for (let i = 1; i <= 2; i++) {
+                let data = JSON.stringify({ id: genreID, page: i });
+                let sendCall = firebase.functions.httpsCallable("getMoviesByGenre");
+                let titlesToConcat
+                await sendCall(data).then(function(result) {
+                    titlesToConcat = result.data;
+                    titles = titles.concat(titlesToConcat);
+                })
+            }
+            resolve(titles)
         })
     }
 }
 
-async function checkAMovie() {
-    let movieID = await TMDB.getMovieID("High School Musical", 2006);
-    let keywordsRaw = await TMDB.getKeywords(movieID);
-    let keywords = TextAnalysis.parseKeywords(keywordsRaw);
-    let wordArrayOne = await TextAnalysis.getSimilarWords(keywords);
-    let parsedTextObject = await TextAnalysis.parseText(testString)
-    let input = parsedTextObject.adjectives.concat(parsedTextObject.nouns, parsedTextObject.places);
-    console.log(input)
-    let wordArrayTwo = await TextAnalysis.getSimilarWords(input)
-    console.log(TextAnalysis.scoreWordArrayByWordArray(wordArrayOne, wordArrayTwo))
+async function findTopThreeMovies(genreIdArray, userInput) {
+    return new Promise(function (resolve, reject) {
+        let movies = await TMDB.getMoviesByGenre(genreIdArray[0]);
+        for (let i = 1; i < genreIdArray.length; i++) {
+            movies = await movies.concat(TMDB.getMoviesByGenre(genreIdArray[1]));
+        }
+        for (let j = 0; j < movies.length; j++) {
+            let keywordsRaw = await TMDB.getKeywords(movies[j].id);
+            let keywords = TextAnalysis.parseKeywords(keywordsRaw);
+            let wordArrayOne = await TextAnalysis.getSimilarWords(keywords);
+            let parsedTextObject = await TextAnalysis.parseText(userInput)
+            let input = parsedTextObject.adjectives.concat(parsedTextObject.nouns, parsedTextObject.places);
+            let wordArrayTwo = await TextAnalysis.getSimilarWords(input);
+            movies[j].score = scoreWordArrayByWordArray(wordArrayOne, wordArrayTwo);
+        }
+        movies.sort(function(a, b) {
+            return b.score - a.score;
+        })
+        let topThreeTitles = [movies[0].title, movies[1].title, movies[2].title]
+        resolve(topThreeTitles);
+    })
 }
