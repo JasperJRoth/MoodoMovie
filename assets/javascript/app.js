@@ -1,41 +1,63 @@
 /**
  * GLOBAL DOM VARIABLES
  */
-var $movies = $("#movies");
-var $movieDetail = $("#movie-detail");
+var $movies;
+var $movieDetail;
+
 
 /**
  * GLOBAL VARIABLES
  */
 var moviesSearched; //stores info for all the movies searched
+var movieSelected = false; //stores the imdbID of the current selected movie
+
+
+function closeDetail(){
+    $movies.children('.card').removeClass("movie-hidden");
+    $movieDetail.css("display","none");
+    movieSelected = false;
+}
 
 /**
  * Render the details of the movie clicked by the user
  */
 function renderMovieDetails(){
-    var movieId = $(this).attr("id");
+    var movieId = $(this).attr("data-cardid");
     var movie;
-    
-    for(var i=0; i < moviesSearched.length; i++) {
-        if(moviesSearched[i].imdbID === movieId){
-            movie = moviesSearched[i];
-            break;
+    var $cardContent = $("#movie-detail .card-content");
+    var $cardAction = $("#movie-detail .card-action");
+    var $cardImg = $("#movie-detail img");
+
+    if (!movieSelected){
+        for(var i=0; i < moviesSearched.length; i++) {
+            if(moviesSearched[i].imdbID === movieId){
+                movie = moviesSearched[i];
+                break;
+            }
         }
-    }
 
-    $("#movies").children('img').removeClass("movie-selected");
-    $(this).addClass("movie-selected");
-    $movieDetail.empty();
+        var $linkClose = $(`<a href="#">`).text("Close");
+        $linkClose.click(closeDetail);
+        $cardAction.empty();
+        $cardAction.append($linkClose);
 
-    $movieDetail.append($("<h3>").text(movie.Title));
-    $movieDetail.append($("<p>").text(`Awards: ${movie.Awards}`));
-    $movieDetail.append($("<p>").text(`${movie.Year} - ${movie.Genre}`));
-    $movieDetail.append($("<p>").text(`Language: ${movie.Language}`));
-    $movieDetail.append($("<p>").text(`Production: ${movie.Production}`));
-    $movieDetail.append($("<p>").text(`Director: ${movie.Director}`));
-    $movieDetail.append($("<p>").text(movie.Plot));
+        $cardContent.empty();
+        $cardContent.append($(`<span class="card-title">`).text(movie.Title));
+        $cardContent.append($("<p>").html(`${movie.Year} - ${movie.Genre}`));
+        $cardContent.append($("<p>").html(`<i class="fas fa-trophy"></i> ${movie.Awards}`));
+        $cardContent.append($("<p>").html(`<i class="fas fa-globe-americas"></i> ${movie.Language}`));
+        $cardContent.append($("<p>").html(`<i class="fas fa-video"></i> ${movie.Production}`));
+        $cardContent.append($("<p>").html(`Director: ${movie.Director}`));
+        $cardContent.append($("<p>").html(`<br>${movie.Plot}`));
     
-    $movieDetail.css("display","block");
+        $cardImg.attr("src",movie.Poster);
+
+        $movies.children('.card').addClass("movie-hidden");
+
+        $movieDetail.css("display","flex");
+        movieSelected = true;
+    
+    }
 }
 
 /** 
@@ -43,12 +65,25 @@ function renderMovieDetails(){
  * Params:  => movie: OMDB API result object with the movie info
  * **/
 function renderMovie(movie){
+    var $card = $("<div class='card'>");
+    var $cardImg = $("<div class='card-image'>");
+    var $cardContent = $("<div class='card-content'>");
     var $img = $("<img>");
-    $img.attr("src",movie.Poster);
-    $img.attr("id",movie.imdbID);
-    $img.click(renderMovieDetails);
 
-    $movies.append($img);
+    $img.attr("src",movie.Poster);
+    $img.attr("data-cardid",movie.imdbID);
+    $img.click(renderMovieDetails);
+        
+    $cardImg.append($img);
+    
+    $cardContent.append($("<span class='card-title'>").text(movie.Title));
+    $cardContent.append($("<p>").text(movie.Plot));
+
+    $card.attr("id",movie.imdbID)
+    $card.append($cardImg);
+    $card.append($cardContent);
+
+    $movies.append($card);
 }
 
 /** 
@@ -129,11 +164,24 @@ firebase.auth().onAuthStateChanged(function(user) {
     }
 });
 
+function searchMovies(){
+    $movies.empty();
+    //THIS IS TEST DATA - MUST BE REMOVED AFTER THE SEARCH IS WORKING
+    getMoviesInfo([{title: "Matrix", year: "1999"},{title: "Tomb Raider", year: "2018"},{title: "Superman", year: "2018"}]);
+}
 
-//THIS IS TEST DATA - MUST BE REMOVED AFTER THE SEARCH IS WORKING
-getMoviesInfo([{title: "Matrix", year: "1999"},{title: "Tomb Raider", year: "2018"},{title: "Superman", year: "2018"}]);
 
 $(document).ready(function(){
+    $movies = $("#movies");
+    $movieDetail = $("#movie-detail");
+
+    $("#search-button").click(searchMovies);
+    $("#search-input").keypress(event => {
+        if(event.key.toUpperCase() == "ENTER"){
+            searchMovies();
+        }
+    });
+
     $("#signInOut").on("click", function(event){
         if(siteAuth.activeUser()){
             hideSignIn()

@@ -5,28 +5,32 @@
     margin: 0;
     justify-content: space-between;
 }
+
 #movies img{
     width: 300px;
     cursor: pointer;
-    border: 3px solid white;
-    border-radius: 5px;
+    height: 450px;
+    overflow: hidden;
 }
-#movies img:hover{
-    border: 3px solid #f4ff07;
+#movies .card{
+    width: 300px;
+    margin: 5px;
 }
-/*when user select a movie to see its details*/
-.movie-selected{
-    border: 3px solid #f4ff07 !important;
+
+#movies .card p{
+    line-height: 1.5em;
+}
+
+
+.movie-hidden{
+    display: none;
 }
 
 #movie-detail{
     display: none;
-    background: #fff;
-    border-radius: 5px;
-    padding: 20px;
-    margin: 20px 0;
-}
-#movie-detail h3{
-    border-bottom: 2px solid #c1c1c1;
+    line-height: 1.5em;
 }
 
+#search-button{
+    cursor: pointer;
+}
