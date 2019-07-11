@@ -51,13 +51,12 @@ function renderMovieDetails(){
         $cardContent.append($("<p>").html(`<br>${movie.Plot}`));
     
         $cardImg.attr("src",movie.Poster);
-
-        $movies.children('.card').addClass("movie-hidden");
-
-        $movieDetail.css("display","flex");
+        
         movieSelected = true;
     
     }
+    $movieDetail.css("display","flex");
+    $movies.children('.card').addClass("movie-hidden");
 }
 
 /** 
@@ -166,6 +165,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 
 function searchMovies(){
     $movies.empty();
+    $movieDetail.css("display","none");
     //THIS IS TEST DATA - MUST BE REMOVED AFTER THE SEARCH IS WORKING
     getMoviesInfo([{title: "Matrix", year: "1999"},{title: "Tomb Raider", year: "2018"},{title: "Superman", year: "2018"}]);
 }
