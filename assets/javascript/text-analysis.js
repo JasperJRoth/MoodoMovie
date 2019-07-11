@@ -133,11 +133,11 @@ var TMDB = {
         })
     },
     getMoviesByGenre: async function(genreID) {
-        return new Promise(function (resolve, reject) {
+        return new Promise(async function (resolve, reject) {
             let titles = [];
             for (let i = 1; i <= 2; i++) {
                 let data = JSON.stringify({ id: genreID, page: i });
-                let sendCall = firebase.functions.httpsCallable("getMoviesByGenre");
+                let sendCall = firebase.functions().httpsCallable("getMoviesByGenre");
                 let titlesToConcat
                 await sendCall(data).then(function(result) {
                     titlesToConcat = result.data;
@@ -150,7 +150,7 @@ var TMDB = {
 }
 
 async function findTopThreeMovies(genreIdArray, userInput) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(async function (resolve, reject) {
         let movies = await TMDB.getMoviesByGenre(genreIdArray[0]);
         for (let i = 1; i < genreIdArray.length; i++) {
             movies = await movies.concat(TMDB.getMoviesByGenre(genreIdArray[1]));
@@ -171,3 +171,5 @@ async function findTopThreeMovies(genreIdArray, userInput) {
         resolve(topThreeTitles);
     })
 }
+
+console.log(findTopThreeMovies([28], "I'm looking for a superhero movie with a lot of strong people and angry guys and big punches"))
