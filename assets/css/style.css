@@ -58,6 +58,7 @@ p {
     grid-template-columns: 10% 40% 40% 10%;
     width: 100vw;
     margin-bottom: 20px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
 }
 
 .dp-btn {
@@ -67,12 +68,14 @@ p {
     text-align: center;
     padding: 13px 0px;
     border-radius: 5px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
 }
 
 .dp-brand-name {
-    font-size: 30px;
+    font-size: 28px;
     grid-column: 2 / 3;
     color: #eeeeee;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
 }
 
 #buttons-div {
