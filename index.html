@@ -27,7 +27,7 @@
         <script src="https://www.gstatic.com/firebasejs/6.2.4/firebase-functions.js"></script>
         
         <!-- Fontawesome -->
-        <!-- <script src="https://kit.fontawesome.com/113cd923d0.js"></script>     -->
+        <script src="https://kit.fontawesome.com/113cd923d0.js"></script>    
 
         <!-- material-icons -->
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -63,9 +63,9 @@
             <div class="card red lighten-2">
                 <div class="card-content ">
                     <div class="input-field">
-                        <i class="material-icons prefix">search</i>
-                        <input id="icon_prefix" type="text" class="grey-text text-darken-4">
-                        <label for="icon_prefix" class="grey-text text-darken-4">Search Movies</label>
+                        <i id="search-button" class="material-icons prefix">search</i>
+                        <input id="search-input" type="text" class="grey-text text-darken-4">
+                        <label for="search-input" class="grey-text text-darken-4">Search Movies</label>
                     </div>
                 </div>
             </div>
@@ -111,8 +111,17 @@
                     </div>
                 </div>
             </div>
+
             <div id="movies"></div>
-            <div id="movie-detail"></div>
+            <div id="movie-detail" class="card">
+                <div class="card-image">
+                    <img src="">
+                </div>
+                <div class="card-stacked">
+                    <div class="card-content"></div>
+                    <div class="card-action"></div>
+                </div>
+            </div>
         </main>
 
         <footer>
