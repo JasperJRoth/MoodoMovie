@@ -348,12 +348,14 @@ async function findTopThreeMovies(genreIdArray, userInput) {
     })
 }
 
-async function test(input) {
-    var topThreeGenres = await findRelevantGenres(input)
-    topThreeGenres = topThreeGenres.map((x) => { return x.id})
-    var topThree = await findTopThreeMovies(topThreeGenres, input)
-    console.log(topThree);
-    return topThree;
+async function search(input) {
+    return new Promise(async function(resolve, reject) {
+        var topThreeGenres = await findRelevantGenres(input)
+        topThreeGenres = topThreeGenres.map((x) => { return x.id})
+        var topThree = await findTopThreeMovies(topThreeGenres, input)
+        console.log(topThree);
+        resolve(topThree);
+    })
 }
 
 // test()
