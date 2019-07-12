@@ -18,6 +18,27 @@ function closeDetail(){
     movieSelected = false;
 }
 
+
+function getMovieTrailer(id){
+    
+    var queryURL = `https://api.themoviedb.org/3/movie/${id}/videos?api_key=70eed93477dcef6557dc7a7fb7b1501b&language=en-US&`;
+    
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+    }).then(function (result){
+        if(result.Error) {
+            console.log(result.Error);
+        }
+        else{
+            let $video = $(`<div class="video-container">`);
+            $video.append(`<iframe width="853" height="480" src="//www.youtube.com/embed/${result.results[0].key}?rel=0" frameborder="0" allowfullscreen></iframe>`);
+            $("#movie-detail .card-content").append($video);
+        }
+    });    
+    
+}
+
 /**
  * Render the details of the movie clicked by the user
  */
@@ -49,9 +70,9 @@ function renderMovieDetails(){
         $cardContent.append($("<p>").html(`<i class="fas fa-video"></i> ${movie.Production}`));
         $cardContent.append($("<p>").html(`Director: ${movie.Director}`));
         $cardContent.append($("<p>").html(`<br>${movie.Plot}`));
-    
+
         $cardImg.attr("src",movie.Poster);
-        
+        getMovieTrailer(movie.id_themoviedb);
         movieSelected = true;
     
     }
@@ -111,7 +132,7 @@ function getMoviesInfo(movies){
                 console.log(result.Error);
             }
             else{
-                //console.log(result);
+                result.id_themoviedb = movie.id;
                 moviesSearched.push(result);
                 renderMovie(result);
             }
@@ -167,7 +188,7 @@ function searchMovies(){
     $movies.empty();
     $movieDetail.css("display","none");
     //THIS IS TEST DATA - MUST BE REMOVED AFTER THE SEARCH IS WORKING
-    getMoviesInfo([{title: "Matrix", year: "1999"},{title: "Tomb Raider", year: "2018"},{title: "Superman", year: "2018"}]);
+    getMoviesInfo([{title: "Matrix", year: "1999", id: "603"},{title: "Tomb Raider", year: "2018", id:"338970"},{title: "Superman", year: "2018", id:"1924"}]);
 }
 
 
