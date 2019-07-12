@@ -345,10 +345,3 @@ async function findTopThreeMovies(genreIdArray, userInput) {
     })
 }
 
-async function test() {
-    var topThree = await findTopThreeMovies([28], "I want to feel sad and watch a romantic movie about beautiful people falling in love")
-    // var topThree = await findRelevantGenres("I want to feel sad and watch a romantic movie about beautiful people falling in love")
-    console.log(topThree);
-}
-
-test()
