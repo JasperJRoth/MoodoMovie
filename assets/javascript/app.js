@@ -9,13 +9,13 @@ var $movieDetail;
  * GLOBAL VARIABLES
  */
 var moviesSearched; //stores info for all the movies searched
-var movieSelected = false; //stores the imdbID of the current selected movie
+var movieSelected = ""; //stores the imdbID of the current selected movie
 
 
 function closeDetail(){
     $movies.children('.card').removeClass("movie-hidden");
     $movieDetail.css("display","none");
-    movieSelected = false;
+    movieSelected = "";
 }
 
 
@@ -31,9 +31,19 @@ function getMovieTrailer(id){
             console.log(result.Error);
         }
         else{
-            let $video = $(`<div class="video-container">`);
-            $video.append(`<iframe width="853" height="480" src="//www.youtube.com/embed/${result.results[0].key}?rel=0" frameborder="0" allowfullscreen></iframe>`);
-            $("#movie-detail .card-content").append($video);
+
+            var $btnWrap = $("#play-btn");
+            var $trailerButton = $(`<button  class="btn-floating btn-small red">`).html(`<i class="fas fa-play play-icon" id="play-icon"></i>`);
+
+            $trailerButton.magnificPopup({
+                items: {
+                    src: `https://www.youtube.com/watch?v=${result.results[0].key}`
+                },
+                type: 'iframe' // this is default type
+            });
+
+            $btnWrap.append($trailerButton);
+            $btnWrap.append(" Play Trailer");
         }
     });    
     
@@ -49,7 +59,7 @@ function renderMovieDetails(){
     var $cardAction = $("#movie-detail .card-action");
     var $cardImg = $("#movie-detail img");
 
-    if (!movieSelected){
+    if (movieSelected != movieId){
         for(var i=0; i < moviesSearched.length; i++) {
             if(moviesSearched[i].imdbID === movieId){
                 movie = moviesSearched[i];
@@ -59,21 +69,48 @@ function renderMovieDetails(){
 
         var $linkClose = $(`<a href="#">`).text("Close");
         $linkClose.click(closeDetail);
+
         $cardAction.empty();
         $cardAction.append($linkClose);
 
+        var $cardTitle = $(`<span class="card-title">`).text(movie.Title);
+        $cardTitle.append($(`<span class="card-title-detail">`).text(` (${movie.Year})`));
+        
+        var $cardInfo = $("<div class='general-info'>");
+
         $cardContent.empty();
-        $cardContent.append($(`<span class="card-title">`).text(movie.Title));
-        $cardContent.append($("<p>").html(`${movie.Year} - ${movie.Genre}`));
-        $cardContent.append($("<p>").html(`<i class="fas fa-trophy"></i> ${movie.Awards}`));
-        $cardContent.append($("<p>").html(`<i class="fas fa-globe-americas"></i> ${movie.Language}`));
-        $cardContent.append($("<p>").html(`<i class="fas fa-video"></i> ${movie.Production}`));
-        $cardContent.append($("<p>").html(`Director: ${movie.Director}`));
-        $cardContent.append($("<p>").html(`<br>${movie.Plot}`));
+        
+        $cardContent.append($cardTitle);
+        $cardInfo.append($("<span>").html(`<i class="fas fa-film genre"></i> ${movie.Genre}`));
+        $cardInfo.append($("<span>").html(`<i class="fas fa-globe language"></i> ${movie.Language}`));
+        $cardInfo.append($("<span>").html(`<i class="far fa-clock clock"></i> ${movie.Runtime}`));
+        $cardInfo.append($("<span>").html(`<i class="fas fa-globe-americas country"></i> ${movie.Country}`));
+        $cardInfo.append($("<span>").html(`<i class="fas fa-video production"></i> ${movie.Production}`));
+        $cardInfo.append($("<span>").html(`<i class="fas fa-trophy awards"></i> ${movie.Awards}`));
+
+        $cardContent.append($cardInfo);
+        
+
+        var $plotHeader =$("<div id='plot-header'>");
+        $plotHeader.append($("<span>").text("Overview"))
+        $plotHeader.append($(`<div id="play-btn">`))
+        $cardContent.append($plotHeader);
+
+        $cardContent.append($("<p id='plot'>").html(movie.Plot));
+        
+        var $crew =$("<div id='crew'>");
+        
+        $crew.append($("<p>").html(`Director<br>${movie.Director}`));
+        $crew.append($("<p>").html(`Actors<br>${movie.Actors}`));
+        $crew.append($("<p>").html(`Writer<br>${movie.Writer}`));
+        
+
+        $cardContent.append($("<p id='crew-header'>").text("Crew"));
+        $cardContent.append($crew);
 
         $cardImg.attr("src",movie.Poster);
         getMovieTrailer(movie.id_themoviedb);
-        movieSelected = true;
+        movieSelected = movieId;
     
     }
     $movieDetail.css("display","flex");
@@ -132,6 +169,7 @@ function getMoviesInfo(movies){
                 console.log(result.Error);
             }
             else{
+                console.log(result);
                 result.id_themoviedb = movie.id;
                 moviesSearched.push(result);
                 renderMovie(result);
