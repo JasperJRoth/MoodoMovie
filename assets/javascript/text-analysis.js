@@ -146,51 +146,57 @@ var genres = [
     {
         "id": 10751,
         "name": "Family",
-        "wordArray": ['family']
+        "wordArray": ['family', 'children', 'fun', 'young', 'happy', 'animation']
     },
     {
         "id": 14,
-        "name": "Fantasy"
+        "name": "Fantasy",
+        "wordArray": ['fantasy', 'magic', 'knight', 'dragon', 'speculative', 'fun', 'dramatic', 'adventure']
     },
     {
         "id": 36,
-        "name": "History"
+        "name": "History",
+        "wordArray":  ['history', 'real world', 'non-fiction', 'prestige', 'awards', 'drama']
     },
     {
         "id": 27,
-        "name": "Horror"
+        "name": "Horror",
+        "wordArray": ['scary', 'spooky', 'monster', 'death', 'horror', 'darkness']
     },
     {
         "id": 10402,
-        "name": "Music"
+        "name": "Music",
+        "wordArray": ["music", 'band', 'song', 'happy', 'disney', 'fun', 'dance']
     },
     {
         "id": 9648,
-        "name": "Mystery"
+        "name": "Mystery",
+        "wordArray": ['mystery', 'detective', 'clues', 'murder', 'sherlock holmes', 'deduction', 'crime', 'drama', 'comedy']
     },
     {
         "id": 10749,
-        "name": "Romance"
+        "name": "Romance",
+        "wordArray": ['romance', 'love', 'sad', 'happy', 'sex', 'marraige', 'meet cute']
     },
     {
         "id": 878,
-        "name": "Science Fiction"
-    },
-    {
-        "id": 10770,
-        "name": "TV Movie"
+        "name": "Science Fiction",
+        "wordArray": ['science', 'science fiction', 'robot', 'space', 'fantasy', 'future', 'technology', 'speculative']
     },
     {
         "id": 53,
-        "name": "Thriller"
+        "name": "Thriller",
+        "wordArray": ['thriller', 'exciting', 'drama', 'serious', 'horror', 'cerebral']
     },
     {
         "id": 10752,
-        "name": "War"
+        "name": "War",
+        "wordArray": ['war', 'history', 'army', 'soldier', 'non-fiction', 'marines', 'navy', 'world war']
     },
     {
         "id": 37,
-        "name": "Western"
+        "name": "Western",
+        "wordArray": ['western', 'cowboy', 'sharpshooter', 'wild west', 'sherrif', 'native american', 'mexican']
     }
 ]
 
@@ -201,8 +207,7 @@ async function findRelevantGenres(userInput) {
         let input = parsedTextObject.adjectives.concat(parsedTextObject.nouns, parsedTextObject.places);
         let wordArrayTwo = await TextAnalysis.getSimilarWords(input);
         for (let i = 0; i < genresList.length; i++) {
-            genresList[i].wordArray = await TextAnalysis.getSimilarWords([genresList[i].name])
-            genresList[i].wordArray = await TextAnalysis.getSimilarWords([genresList[i].wordArray.map((x) => { x = x.word})])
+            genresList[i].wordArray = await TextAnalysis.getSimilarWords(genresList[i].wordArray)
             genresList[i].score = TextAnalysis.scoreWordArrayByWordArray(genresList[i].wordArray, wordArrayTwo)
         }
         genresList.sort(function (a, b) {
@@ -217,27 +222,20 @@ async function findRelevantGenres(userInput) {
 var TMDB = {
     getKeywords(movieID) {
         return new Promise(async function(resolve, reject) {
-            let data = {id: movieID};
-            console.log(data)
-            let sendCall = firebase.functions().httpsCallable("getKeywords");
-            let keywords
-            sendCall(data).then(function(result) {
-                keywords = result.data
-                console.log(keywords)
-                resolve(keywords);
-            });
-        })
-    },
-    getMovieID(movieTitle, movieYear) {
-        return new Promise(function (resolve, reject) {
-            let data = { title: movieTitle, year: movieYear };
-            let sendCall = firebase.functions().httpsCallable("getMovieID");
-            let movieID
-            sendCall(data).then(function (result) {
-                movieID = result.data
-                console.log(movieID)
-                resolve(movieID);
-            });
+            if (movieID) {
+                let data = {id: movieID};
+                console.log(data)
+                let sendCall = firebase.functions().httpsCallable("getKeywords");
+                let keywords
+                sendCall(data).then(function(result) {
+                    keywords = result.data
+                    console.log(keywords)
+                    resolve(keywords);
+                });
+            }
+            else {
+                resolve(false);
+            }
         })
     },
     getMoviesByGenre: async function(genreID) {
@@ -329,12 +327,17 @@ async function findTopThreeMovies(genreIdArray, userInput) {
         for (let j = 0; j < movies.length; j++) {
             console.log("one")
             let keywordsRaw = await TMDB.getKeywords(movies[j].id);
-            console.log("two")
-            let keywords = TextAnalysis.parseKeywords(keywordsRaw);
-            console.log("three")
-            let wordArrayOne = await TextAnalysis.getSimilarWords(keywords);
-            movies[j].score = TextAnalysis.scoreWordArrayByWordArray(wordArrayOne, wordArrayTwo);
-            console.log("hi")
+            if (keywordsRaw) {
+                console.log("two")
+                let keywords = TextAnalysis.parseKeywords(keywordsRaw);
+                console.log("three")
+                let wordArrayOne = await TextAnalysis.getSimilarWords(keywords);
+                movies[j].score = TextAnalysis.scoreWordArrayByWordArray(wordArrayOne, wordArrayTwo);
+                console.log("hi")
+            }
+            else {
+                movies[j].score = 0
+            }
         }
         movies.sort(function(a, b) {
             return b.score - a.score;
@@ -345,3 +348,12 @@ async function findTopThreeMovies(genreIdArray, userInput) {
     })
 }
 
+async function test(input) {
+    var topThreeGenres = await findRelevantGenres(input)
+    topThreeGenres = topThreeGenres.map((x) => { return x.id})
+    var topThree = await findTopThreeMovies(topThreeGenres, input)
+    console.log(topThree);
+    return topThree;
+}
+
+// test()
