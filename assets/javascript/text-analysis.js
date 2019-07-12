@@ -107,10 +107,118 @@ var TextAnalysis = {
     }
 }
 
+var genres = [
+    {
+        "id": 28,
+        "name": "Action",
+        "wordArray": ['action', 'police', 'army', 'fight', 'shoot', 'punch', 'kick', 'die', 'kill', 'tough', 'strong', 'angry']
+    },
+    {
+        "id": 12,
+        "name": "Adventure",
+        "wordArray": ['fun', 'travel', 'action', 'adventure', 'swashbuckling', 'treasure', 'villain', 'happy']
+    },
+    {
+        "id": 16,
+        "name": "Animation",
+        "wordArray": ['animation', 'children', 'nostalgia', 'fun', 'disney', 'pixar', 'fairy tale', 'happy']
+    },
+    {
+        "id": 35,
+        "name": "Comedy",
+        "wordArray": ['laugh', 'comedy', 'fun', 'happy', 'joke', 'irreverant', 'dumb']
+    },
+    {
+        "id": 80,
+        "name": "Crime",
+        "wordArray": ['police', 'law', 'crime', 'robbery', 'murder', 'tough', 'action', 'criminal', 'gangster']
+    },
+    {
+        "id": 99,
+        "name": "Documentary",
+        "wordArray": ["documentary", "non-fiction", 'real world', 'people', 'story', 'history']
+    },
+    {
+        "id": 18,
+        "name": "Drama",
+        "wordArray": ['sad', 'drama', 'serious', 'family', 'love', 'angry', 'bittersweet', 'prestige', 'awards']
+    },
+    {
+        "id": 10751,
+        "name": "Family",
+        "wordArray": ['family']
+    },
+    {
+        "id": 14,
+        "name": "Fantasy"
+    },
+    {
+        "id": 36,
+        "name": "History"
+    },
+    {
+        "id": 27,
+        "name": "Horror"
+    },
+    {
+        "id": 10402,
+        "name": "Music"
+    },
+    {
+        "id": 9648,
+        "name": "Mystery"
+    },
+    {
+        "id": 10749,
+        "name": "Romance"
+    },
+    {
+        "id": 878,
+        "name": "Science Fiction"
+    },
+    {
+        "id": 10770,
+        "name": "TV Movie"
+    },
+    {
+        "id": 53,
+        "name": "Thriller"
+    },
+    {
+        "id": 10752,
+        "name": "War"
+    },
+    {
+        "id": 37,
+        "name": "Western"
+    }
+]
+
+async function findRelevantGenres(userInput) {
+    return new Promise(async function(resolve, reject) {
+        let genresList = genres;
+        let parsedTextObject = await TextAnalysis.parseText(userInput)
+        let input = parsedTextObject.adjectives.concat(parsedTextObject.nouns, parsedTextObject.places);
+        let wordArrayTwo = await TextAnalysis.getSimilarWords(input);
+        for (let i = 0; i < genresList.length; i++) {
+            genresList[i].wordArray = await TextAnalysis.getSimilarWords([genresList[i].name])
+            genresList[i].wordArray = await TextAnalysis.getSimilarWords([genresList[i].wordArray.map((x) => { x = x.word})])
+            genresList[i].score = TextAnalysis.scoreWordArrayByWordArray(genresList[i].wordArray, wordArrayTwo)
+        }
+        genresList.sort(function (a, b) {
+            return b.score - a.score;
+        })
+        console.log(genresList)
+        let topThreeGenres = [genresList[0], genresList[1], genresList[2]]
+        resolve(topThreeGenres);
+    })
+}
+
 var TMDB = {
     getKeywords(movieID) {
         return new Promise(async function(resolve, reject) {
-            let data = JSON.stringify({id: movieID});
+            let data = {id: movieID};
+            console.log(data)
             let sendCall = firebase.functions().httpsCallable("getKeywords");
             let keywords
             sendCall(data).then(function(result) {
@@ -122,7 +230,7 @@ var TMDB = {
     },
     getMovieID(movieTitle, movieYear) {
         return new Promise(function (resolve, reject) {
-            let data = JSON.stringify({ title: movieTitle, year: movieYear });
+            let data = { title: movieTitle, year: movieYear };
             let sendCall = firebase.functions().httpsCallable("getMovieID");
             let movieID
             sendCall(data).then(function (result) {
@@ -136,40 +244,111 @@ var TMDB = {
         return new Promise(async function (resolve, reject) {
             let titles = [];
             for (let i = 1; i <= 2; i++) {
-                let data = JSON.stringify({ id: genreID, page: i });
+                let data = { id: genreID, page: i };
+                console.log(data)
                 let sendCall = firebase.functions().httpsCallable("getMoviesByGenre");
                 let titlesToConcat
+                // titles = titles.concat(titlesToConcat);
                 await sendCall(data).then(function(result) {
+                    console.log(result)
                     titlesToConcat = result.data;
                     titles = titles.concat(titlesToConcat);
                 })
             }
+            console.log(titles)
+            // document.write(JSON.stringify(titles))
             resolve(titles)
         })
     }
 }
 
+// function getMoviesByGenre(data) {
+//     return new Promise(function (resolve, reject) {
+//         var dataParsed = JSON.parse(data);
+//         var genreID = dataParsed.id;
+//         var page = dataParsed.page;
+//         var apiKey = "c07a02e77846bc61b3a6ece1fabeeee2";
+//         var movies = []
+//         var url = "https://api.themoviedb.org/3/discover/movie?api_key=" + apiKey + "&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=" + page + "&primary_release_date.lte=2018-07-10&vote_average.gte=6&with_genres=" + genreID
+//         var xhttp = new XMLHttpRequest;
+//         xhttp.onreadystatechange = function () {
+//             if (this.readyState == 4 && this.status == 200) {
+//                 let results = JSON.parse(xhttp.responseText).results;
+//                 console.log(results)
+//                 for (let result of results) {
+//                     movies.push({ title: result.title, id: result.id })
+//                 }
+//                 console.log(movies)
+//                 resolve(movies)
+//             }
+//         };
+//         xhttp.open("GET", url, true);
+//         xhttp.send()
+
+//     })
+// }
+
+// function getKeywords(data) {
+//     return new Promise(async function (resolve, reject) {
+//         var dataParsed = JSON.parse(data);
+//         var movieID = dataParsed.id;
+//         var apiKey = "c07a02e77846bc61b3a6ece1fabeeee2";
+//         var keywords = []
+//         var url = "https://api.themoviedb.org/3/movie/" + movieID + "/keywords?api_key=" + apiKey
+//         var xhttp = new XMLHttpRequest;
+//         xhttp.onreadystatechange = function () {
+//             if (this.readyState == 4 && this.status == 200) {
+//                 let results = JSON.parse(xhttp.responseText).keywords;
+//                 console.log(results)
+//                 for (let result of results) {
+//                     keywords.push(result.name)
+//                 }
+//                 console.log(keywords)
+//                 // resolve(keywords)
+//             }
+//         };
+//         xhttp.open("GET", url, true);
+//         await xhttp.send()
+//         resolve(keywords)
+//     })
+// }
+
 async function findTopThreeMovies(genreIdArray, userInput) {
     return new Promise(async function (resolve, reject) {
         let movies = await TMDB.getMoviesByGenre(genreIdArray[0]);
+        console.log(movies)
+        console.log(1)
         for (let i = 1; i < genreIdArray.length; i++) {
             movies = await movies.concat(TMDB.getMoviesByGenre(genreIdArray[1]));
+            console.log(2)
         }
+        console.log(3)
+        let parsedTextObject = await TextAnalysis.parseText(userInput)
+        let input = parsedTextObject.adjectives.concat(parsedTextObject.nouns, parsedTextObject.places);
+        let wordArrayTwo = await TextAnalysis.getSimilarWords(input);
         for (let j = 0; j < movies.length; j++) {
+            console.log("one")
             let keywordsRaw = await TMDB.getKeywords(movies[j].id);
+            console.log("two")
             let keywords = TextAnalysis.parseKeywords(keywordsRaw);
+            console.log("three")
             let wordArrayOne = await TextAnalysis.getSimilarWords(keywords);
-            let parsedTextObject = await TextAnalysis.parseText(userInput)
-            let input = parsedTextObject.adjectives.concat(parsedTextObject.nouns, parsedTextObject.places);
-            let wordArrayTwo = await TextAnalysis.getSimilarWords(input);
-            movies[j].score = scoreWordArrayByWordArray(wordArrayOne, wordArrayTwo);
+            movies[j].score = TextAnalysis.scoreWordArrayByWordArray(wordArrayOne, wordArrayTwo);
+            console.log("hi")
         }
         movies.sort(function(a, b) {
             return b.score - a.score;
         })
-        let topThreeTitles = [movies[0].title, movies[1].title, movies[2].title]
+        let topThreeTitles = [movies[0], movies[1], movies[2]]
+        console.log(topThreeTitles)
         resolve(topThreeTitles);
     })
 }
 
-console.log(findTopThreeMovies([28], "I'm looking for a superhero movie with a lot of strong people and angry guys and big punches"))
+async function test() {
+    var topThree = await findTopThreeMovies([28], "I want to feel sad and watch a romantic movie about beautiful people falling in love")
+    // var topThree = await findRelevantGenres("I want to feel sad and watch a romantic movie about beautiful people falling in love")
+    console.log(topThree);
+}
+
+test()
