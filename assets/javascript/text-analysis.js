@@ -172,4 +172,3 @@ async function findTopThreeMovies(genreIdArray, userInput) {
     })
 }
 
-console.log(findTopThreeMovies([28], "I'm looking for a superhero movie with a lot of strong people and angry guys and big punches"))
