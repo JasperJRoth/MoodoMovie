@@ -1,5 +1,11 @@
 @import url('https://fonts.googleapis.com/css?family=Audiowide&display=swap');
 
+#watchedList{
+    display: none;
+}
+.displayBlock{
+    display: "block";
+}
 
 #movies {
     display: flex;
