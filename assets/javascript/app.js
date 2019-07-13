@@ -22,7 +22,6 @@ var movieSelected = ""; //stores the imdbID of the current selected movie
 var searchIsRunning = false;
 var countMovies;
 
-
 //stores the watched movie in the localStorage
 function storeWatchedList(data){
     //check if browser supports storage
@@ -246,7 +245,6 @@ function renderMovieDetails(){
         $crew.append($("<p>").html(`Director<br>${movie.Director}`));
         $crew.append($("<p>").html(`Actors<br>${movie.Actors}`));
         $crew.append($("<p>").html(`Writer<br>${movie.Writer}`));
-        
 
         $cardContent.append($("<p id='crew-header'>").text("Crew"));
         $cardContent.append($crew);
@@ -256,6 +254,39 @@ function renderMovieDetails(){
         getMovieTrailer(movie.id_themoviedb);
         movieSelected = movieId;
     
+/**
+ * Search on netflix and prime
+ */   
+
+var $linkNetflix = $(`<a target="_blank" href="https://www.netflix.com/search?q=${movie.Title}">`);
+var $imgNetflix = $(`<img data-provider="prime" src=
+"assets/images/netflix-icon.jpeg" class="streamicon">`);
+$linkNetflix.append($imgNetflix);
+$cardContent.append($linkNetflix);
+
+var $spacerIcon = $(`<img ="_blank" class="spacericon">`);
+$cardContent.append($spacerIcon);
+
+var $linkPrime = $(`<a target="_blank" href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${movie.Title}&ie=UTF8">`);
+var $imgPrime = $(`<img data-provider="prime" src=
+"assets/images/prime-icon.png" class="streamicon">`);
+$linkPrime.append($imgPrime);
+$cardContent.append($linkPrime);
+
+var $spacerIcon = $(`<img ="_blank" class="spacericon">`);
+$cardContent.append($spacerIcon);
+
+var $linkCrave = $(`<a target="_blank" href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${movie.Title}&ie=UTF8">`);
+var $imgCrave = $(`<img data-provider="prime" src=
+"assets/images/crave-icon.png" class="streamicon">`);
+$linkCrave.append($imgCrave);
+$cardContent.append($linkCrave);
+
+/**
+* end search
+*/
+
+
     }
     $movieDetail.css("display","flex");
     $movies.children('.card').addClass("movie-hidden");
@@ -295,7 +326,7 @@ function renderMovie(movie){
  * **/
 function getMoviesInfo(movies){
     moviesSearched = [];
-    countMovies = 0;
+    countMovies = 1;
     
     var queryParams = {};
     queryParams.apikey = "trilogy";
@@ -321,7 +352,6 @@ function getMoviesInfo(movies){
                     moviesSearched.push(result);
                     renderMovie(result);
                 }
-                
                 countMovies++;
             }
         });    
