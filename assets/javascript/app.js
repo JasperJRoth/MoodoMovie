@@ -295,7 +295,7 @@ function renderMovie(movie){
  * **/
 function getMoviesInfo(movies){
     moviesSearched = [];
-    countMovies = 0;
+    countMovies = 1;
     
     var queryParams = {};
     queryParams.apikey = "trilogy";
@@ -316,6 +316,7 @@ function getMoviesInfo(movies){
                 console.log(result.Error);
             }
             else{
+                console.log(countMovies);
                 if(countMovies < 4){
                     result.id_themoviedb = movie.id;
                     moviesSearched.push(result);
