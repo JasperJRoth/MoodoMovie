@@ -12,39 +12,53 @@ var TextAnalysis = {
     },
     getSimilarWords(inputWordArray) {
         return new Promise(function(resolve, reject) {
-            try {
-                var outputWordArray = [];
-                for (let j = 0; j < inputWordArray.length; j++) {
-                    let word = inputWordArray[j];
-                    outputWordArray.push([word, 3])
-                    var maxscore
-                    $.ajax({
-                        url: "https://api.datamuse.com/words?ml="+word+"&topics=movie",
-                        method: "GET",
-                        error: function() {
-                            TextAnalysis.getSimilarWordsSafe(inputWordArray);  
-                        },
-                        success: response => {
-                            for (let i = 0; i < response.length; i++) {
-                                let item = response[i]
-                                if (i === 0) {
-                                    maxscore = item.score
-                                }
-                                let score = item.score/maxscore
-                                if (score > 0) {
-                                    outputWordArray.push([item.word, score])
-                                }
-                            }
-                            if (j === inputWordArray.length - 1) {
-                                resolve(outputWordArray);
-                            }
+            var outputWordArray = [];
+            for (let j = 0; j < inputWordArray.length; j++) {
+                let word = inputWordArray[j];
+                outputWordArray.push([word, 3])
+                var maxscore
+                $.ajax({
+                    url: "http://api.datamuse.com/words?ml="+word+"&topics=movie",
+                    method: "GET"
+                }).then(function(response) {
+                    for (let i = 0; i < response.length; i++) {
+                        let item = response[i]
+                        if (i === 0) {
+                            maxscore = item.score
                         }
-                    })
-                }
-            }
-            catch(error) {
-                console.log("Your browser is blocking CORS requests which will make our application run slower")
-                getSimilarWordsSafe(inputWordArray)
+                        let score = item.score / maxscore
+                        if (score > 0) {
+                            outputWordArray.push([item.word, score])
+                        }
+                    }
+                    if (j === inputWordArray.length - 1) {
+                        resolve(outputWordArray);
+                    }
+                })
+                // let xhttp = new XMLHttpRequest;
+                // let url = "https://api.datamuse.com/words?ml=" + word + "&topics=movie"
+                // xhttp.onreadystatechange = function() {
+                //     if (this.readyState == 4 && this.status == 200) {
+                //         let results = JSON.parse(xhttp.responseText).results;
+                //         for (let i = 0; i < results.length; i++) {
+                //             let item = results[i]
+                //             if (i === 0) {
+                //                 maxscore = item.score
+                //             }
+                //             let score = item.score/maxscore
+                //             if (score > 0) {
+                //                 outputWordArray.push([item.word, score])
+                //             }
+                //         }
+                //         if (j === inputWordArray.length - 1) {
+                //             resolve(outputWordArray);
+                //         }
+                //     }
+                // }
+                // xhttp.open("GET", url, true);
+                // xhttp.setRequestHeader("Access-Control-Allow-Origin", "*")
+                // xhttp.setRequestHeader("Access-Control-Allow-Methods", "GET")
+                // xhttp.send()
             }
         })
     },
