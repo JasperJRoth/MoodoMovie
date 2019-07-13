@@ -374,11 +374,14 @@ firebase.auth().onAuthStateChanged(function(user) {
     }
 });
 
-function searchMovies(){
+async function searchMovies(){
     $movies.empty();
     $movieDetail.css("display","none");
     //THIS IS TEST DATA - MUST BE REMOVED AFTER THE SEARCH IS WORKING
-    getMoviesInfo([{title: "Matrix", year: "1999", id: "603"},{title: "Tomb Raider", year: "2018", id:"338970"},{title: "Superman", year: "2018", id:"1924"}]);
+    // getMoviesInfo([{title: "Matrix", year: "1999", id: "603"},{title: "Tomb Raider", year: "2018", id:"338970"},{title: "Superman", year: "2018", id:"1924"}]);
+    var results = await search($("#search-input").val().trim());
+    console.log(results);
+    getMoviesInfo(results);
 }
 
 
