@@ -22,7 +22,7 @@ var TextAnalysis = {
                         url: "https://api.datamuse.com/words?ml="+word+"&topics=movie",
                         method: "GET",
                         error: function() {
-                            getSimilarWordsSafe(inputWordArray);  
+                            TextAnalysis.getSimilarWordsSafe(inputWordArray);  
                         },
                         success: response => {
                             for (let i = 0; i < response.length; i++) {
