@@ -366,7 +366,7 @@ async function searchMovies(){
     var userInput = $("#search-input").val().trim();
     
     if(userInput != ""){
-        var results = await search();
+        var results = await search(userInput);
         getMoviesInfo(results);
     }
     
