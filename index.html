@@ -5,16 +5,14 @@
         <meta charset="utf-8">
 
         <title>MoodoMovie</title>
-        
-
-        <link rel="stylesheet" href="assets/css/reset.css">
 
         <!-- jQuery -->
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
-        <!-- Bootstrap references -->
-        <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script> -->
+
+        <!-- Magnific Popup references -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css">
 
         <!-- Materialise references -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
@@ -38,6 +36,9 @@
         <!-- Compromise reference -->
         <script src="https://unpkg.com/compromise@latest/builds/compromise.min.js"></script>
 
+        <!-- Animations -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
+
         <!-- Custom css -->
         <link rel="stylesheet" href="assets/css/theme.css">
         <link rel="stylesheet" href="assets/css/style.css">
@@ -50,9 +51,9 @@
             <div class="dp-navbar dp-background-dark-blue">
                 <h1 class="dp-brand-name">MoodoMovie</h1>
                 <div id="buttons-div">
+                    <a class="dp-background-red dp-btn grey-text text-lighten-3" id="watchedList">Watched List</a>
                     <a class="dp-background-red dp-btn grey-text text-lighten-3" id="signInOut">Log In</a>
                     <a class="dp-background-red dp-btn grey-text text-lighten-3" id="signUp">Sign Up</a>
-                    <!-- <a class="grey-text text-lighten-3 waves-effect waves-light btn col s3 offset-s1 noFloat" id="googleSignIn">Sign In With Google</a> -->
                 </div>
             </div>
 
@@ -61,8 +62,8 @@
                 <div class="card-content ">
                     <div class="input-field">
                         <i id="search-button" class="material-icons prefix">search</i>
-                        <input id="search-input" type="text" class="grey-text text-darken-4">
-                        <label for="search-input" class="grey-text text-darken-4">Search Movies</label>
+                        <input id="search-input" placeholder="I want to watch a musical that is funny and happy and has a dog" type="text" class="grey-text text-darken-4">
+                        <label for="search-input" class="grey-text text-darken-4">What Kind Of Movie Are You In The Mood For?</label>
                     </div>
                 </div>
             </div>
@@ -84,6 +85,7 @@
                     </div>
                     <div class="row">
                         <a class="waves-effect waves-light btn col s2 offset-s1" id="loginSubmit">Log In</a>
+                        <a class="grey-text text-lighten-3 waves-effect waves-light btn col s4 offset-s1 noFloat" id="googleSignIn">Sign In With Google</a>
                     </div>
                 </div>
             </div>
@@ -108,8 +110,12 @@
                     </div>
                 </div>
             </div>
+            <div id="status-container" class="hidden">
+                <div id="status-bar"></div>
+            </div>
 
-            <div id="movies"></div>
+            <div id="movies">
+            </div>
             <div id="movie-detail" class="card">
                 <div class="card-image">
                     <img src="">

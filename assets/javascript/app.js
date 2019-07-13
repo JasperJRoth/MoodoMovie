@@ -20,7 +20,7 @@ var moviesSearched; //stores info for all the movies searched
 var moviesWatched = []; //stores the list of movie objects that the user marked as wathed
 var movieSelected = ""; //stores the imdbID of the current selected movie
 var searchIsRunning = false;
-
+var countMovies;
 
 //stores the watched movie in the localStorage
 function storeWatchedList(data){
@@ -326,7 +326,7 @@ function renderMovie(movie){
  * **/
 function getMoviesInfo(movies){
     moviesSearched = [];
-    var countMovies = 0;
+    countMovies = 1;
     
     var queryParams = {};
     queryParams.apikey = "trilogy";

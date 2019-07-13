@@ -222,6 +222,7 @@ p {
     display: none !important;
 }
 
+
 .streamicon {
     height: 50px;
     width: 50px;
@@ -231,6 +232,7 @@ p {
 .spacericon {
     width:15px;
 }
+
 
 @media screen and (max-width: 466px){
     #movies {
