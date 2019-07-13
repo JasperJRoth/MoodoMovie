@@ -19,6 +19,7 @@ var $watchedListButton;
 var moviesSearched; //stores info for all the movies searched
 var moviesWatched = []; //stores the list of movie objects that the user marked as wathed
 var movieSelected = ""; //stores the imdbID of the current selected movie
+var searchIsRunning = false;
 
 
 //stores the watched movie in the localStorage
@@ -360,14 +361,19 @@ function showWatchedListButton(){
 
 
 async function searchMovies(){
-    $movies.empty();
-    $movieDetail.css("display","none");
 
-    var userInput = $("#search-input").val().trim();
+    if(!searchIsRunning){
+        searchIsRunning = true;
+        $movies.empty();
+        $movieDetail.css("display","none");
     
-    if(userInput != ""){
-        var results = await search();
-        getMoviesInfo(results);
+        var userInput = $("#search-input").val().trim();
+        
+        if(userInput != ""){
+            var results = await search();
+            getMoviesInfo(results);
+        }
+        searchIsRunning = false;
     }
     
 }
