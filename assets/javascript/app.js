@@ -29,7 +29,7 @@ function storeWatchedList(data){
     }
 
     //update the firebase storage
-    //...to be implemented yet!
+    siteAuth.setUserData(data);
 
 }
 
@@ -46,11 +46,6 @@ function getWatchedListFromLocal(){
 
     return data;
 
-}
-
-//retrieves the watched list stored in the firebase
-function getWatchedListFromDB(user){
-    //...
 }
 
 function toggleWatchedMovie(){
@@ -192,14 +187,22 @@ function getWatchedActionButton(movieId){
 function renderMovieDetails(){
     var movieId = $(this).attr("data-cardid");
     var movie;
+    var list;
+    var watchedListOpen = $("#watched-list-shown").val();
     var $cardContent = $("#movie-detail .card-content");
     var $cardAction = $("#movie-detail .card-action");
     var $cardImg = $("#movie-detail img");
 
+    if(watchedListOpen === "yes")
+        list = moviesWatched;
+    else
+        list = moviesSearched;
+
+
     if (movieSelected != movieId){
-        for(var i=0; i < moviesSearched.length; i++) {
-            if(moviesSearched[i].imdbID === movieId){
-                movie = moviesSearched[i];
+        for(var i=0; i < list.length; i++) {
+            if(list[i].imdbID === movieId){
+                movie = list[i];
                 break;
             }
         }
@@ -356,32 +359,17 @@ function showWatchedListButton(){
 }
 
 
-//checks if the user is authenticated
-firebase.auth().onAuthStateChanged(function(user) {
-    if (user) {
-        $("#signInOut").text("Sign Out");
-        hideSignUpButton();
-        showWatchedListButton();
-
-        //...to be implemented!!
-        //moviesWatched = getWatchedListFromDB(user);
-        //....
-
-    } else {
-        $("#signInOut").text("Log In");
-        showSignUpButton();
-        hideWatchedListButton();
-    }
-});
-
 async function searchMovies(){
     $movies.empty();
     $movieDetail.css("display","none");
-    //THIS IS TEST DATA - MUST BE REMOVED AFTER THE SEARCH IS WORKING
-    // getMoviesInfo([{title: "Matrix", year: "1999", id: "603"},{title: "Tomb Raider", year: "2018", id:"338970"},{title: "Superman", year: "2018", id:"1924"}]);
-    var results = await search($("#search-input").val().trim());
-    console.log(results);
-    getMoviesInfo(results);
+
+    var userInput = $("#search-input").val().trim();
+    
+    if(userInput != ""){
+        var results = await search();
+        getMoviesInfo(results);
+    }
+    
 }
 
 
@@ -436,6 +424,23 @@ $(document).ready(function(){
         siteAuth.signUp(email, pass);
     });
 
-    
+    //checks if the user is authenticated
+    firebase.auth().onAuthStateChanged(async function(user) {
+        if (user) {
+            $("#signInOut").text("Sign Out");
+            hideSignUpButton();
+            showWatchedListButton();
+            
+            //retrieves the watched list stored in the firebase and update the localStoreage
+            moviesWatched = await siteAuth.getUserData();
+            storeWatchedList(moviesWatched);
+            //...
+
+        } else {
+            $("#signInOut").text("Log In");
+            showSignUpButton();
+            hideWatchedListButton();
+        }
+    });    
 
 });
