@@ -242,4 +242,16 @@ p {
     #movies .card{
         width: 100%;
     }
+
+    .dp-navbar {
+        display: flex;
+        flex-wrap: wrap;
+        padding-bottom: 10px;
+        justify-content: center;
+    }
+    .dp-btn {
+        width: 150px;
+        text-align: center;
+        padding: 10px 0px;
+    }
 }

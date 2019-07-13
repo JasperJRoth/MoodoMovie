@@ -254,37 +254,34 @@ function renderMovieDetails(){
         getMovieTrailer(movie.id_themoviedb);
         movieSelected = movieId;
     
-/**
- * Search on netflix and prime
- */   
+        /**
+         * Search on netflix and prime
+         */   
 
-var $linkNetflix = $(`<a target="_blank" href="https://www.netflix.com/search?q=${movie.Title}">`);
-var $imgNetflix = $(`<img data-provider="prime" src=
-"assets/images/netflix-icon.jpeg" class="streamicon">`);
-$linkNetflix.append($imgNetflix);
-$cardContent.append($linkNetflix);
+        var $linkNetflix = $(`<a target="_blank" title="Search on Netflix" href="https://www.netflix.com/search?q=${movie.Title}">`);
+        var $imgNetflix = $(`<img data-provider="prime" src="assets/images/netflix-icon.jpeg" class="streamicon">`);
+        $linkNetflix.append($imgNetflix);
+        $cardContent.append($linkNetflix);
 
-var $spacerIcon = $(`<img ="_blank" class="spacericon">`);
-$cardContent.append($spacerIcon);
+        var $spacerIcon = $(`<img ="_blank" class="spacericon">`);
+        $cardContent.append($spacerIcon);
 
-var $linkPrime = $(`<a target="_blank" href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${movie.Title}&ie=UTF8">`);
-var $imgPrime = $(`<img data-provider="prime" src=
-"assets/images/prime-icon.png" class="streamicon">`);
-$linkPrime.append($imgPrime);
-$cardContent.append($linkPrime);
+        var $linkPrime = $(`<a target="_blank" title="Search on Prime" href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${movie.Title}&ie=UTF8">`);
+        var $imgPrime = $(`<img data-provider="prime" src="assets/images/prime-icon.png" class="streamicon">`);
+        $linkPrime.append($imgPrime);
+        $cardContent.append($linkPrime);
 
-var $spacerIcon = $(`<img ="_blank" class="spacericon">`);
-$cardContent.append($spacerIcon);
+        var $spacerIcon = $(`<img ="_blank" class="spacericon">`);
+        $cardContent.append($spacerIcon);
 
-var $linkCrave = $(`<a target="_blank" href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${movie.Title}&ie=UTF8">`);
-var $imgCrave = $(`<img data-provider="prime" src=
-"assets/images/crave-icon.png" class="streamicon">`);
-$linkCrave.append($imgCrave);
-$cardContent.append($linkCrave);
+        var $linkCrave = $(`<a target="_blank" title="Search on Crave" href="https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${movie.Title}&ie=UTF8">`);
+        var $imgCrave = $(`<img data-provider="prime" src="assets/images/crave-icon.png" class="streamicon">`);
+        $linkCrave.append($imgCrave);
+        $cardContent.append($linkCrave);
 
-/**
-* end search
-*/
+        /**
+        * end search
+        */
 
 
     }
