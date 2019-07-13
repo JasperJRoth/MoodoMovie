@@ -347,6 +347,7 @@ function getMoviesInfo(movies){
                 console.log(result.Error);
             }
             else{
+                
                 if(countMovies < 4){
                     result.id_themoviedb = movie.id;
                     moviesSearched.push(result);
