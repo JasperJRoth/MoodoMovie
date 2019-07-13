@@ -222,6 +222,18 @@ p {
     display: none !important;
 }
 
+
+.streamicon {
+    height: 50px;
+    width: 50px;
+    background: black;
+}
+
+.spacericon {
+    width:15px;
+}
+
+
 @media screen and (max-width: 466px){
     #movies {
         justify-content: center;
