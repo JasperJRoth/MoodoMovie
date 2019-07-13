@@ -41,6 +41,27 @@
     line-height: 1.5em;
 }
 
+#status-container {
+    width: 200px;
+    height: 50px;
+    border: 2px solid #3A1CA6 ;
+    padding: 5px;
+    border-radius: 10px;
+    display: block;
+    margin: 0px auto;
+}
+
+#status-bar {
+    width: 0%;
+    height: 100%;
+    background-color: #3A1CA6 ;
+    border-radius: 10px;
+    color: #eeeeee;
+    font-weight: 600;
+    text-align: center;
+    overflow: hidden;
+}
+
 
 .movie-hidden{
     display: none;
@@ -175,10 +196,9 @@ p {
 
 .dp-btn {
     width: 150px;
-    height: 40px;
     margin: auto 5px;
     text-align: center;
-    padding: 13px 0px;
+    padding: 10px 0px;
     border-radius: 5px;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
 }
@@ -196,4 +216,8 @@ p {
     display: flex;
     align-content: center;
     justify-content: flex-end;
+}
+
+.hidden {
+    display: none !important;
 }

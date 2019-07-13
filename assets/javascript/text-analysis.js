@@ -138,7 +138,7 @@ var TextAnalysis = {
         let multiplier = 1;
         for (let word of genresById[genreID].multiplierArray) {
             if (userInput.indexOf(word) > -1) {
-                multiplier++
+                multiplier += 4
             }
         }
         return multiplier
@@ -147,14 +147,14 @@ var TextAnalysis = {
         let multiplier = 1;
         for (let word of input) {
             if (plot.indexOf(word) > -1) {
-                multiplier++
+                multiplier += 4
             }
         }
         return multiplier
     }
 }
 
-var genres = [
+const genresConstant = JSON.stringify([
     {
         "id": 28,
         "name": "Action",
@@ -245,7 +245,7 @@ var genres = [
         "name": "Western",
         "wordArray": ['western', 'cowboy', 'sharpshooter', 'wild west', 'sherrif', 'native american', 'mexican']
     }
-]
+])
 
 var genresById = {
     "28": {
@@ -261,7 +261,7 @@ var genresById = {
     "16": {
         "name": "Animation",
         "wordArray": ['animation', 'children', 'nostalgia', 'fun', 'disney', 'pixar', 'fairy tale', 'happy'],
-        multiplierArray: ['animation', 'family', 'child', 'kid']
+        multiplierArray: ['animat', 'family', 'cartoon', 'kid']
     },
     "35": {
         "name": "Comedy",
@@ -286,7 +286,7 @@ var genresById = {
     "10751": {
         "name": "Family",
         "wordArray": ['family', 'children', 'fun', 'young', 'happy', 'animation'],
-        multiplierArray: ['family', 'children', 'kid', 'animation']
+        multiplierArray: ['family', 'cartoon', 'kid', 'animat']
     },
     "14": {
         "name": "Fantasy",
@@ -344,14 +344,21 @@ var genresList = null;
 
 async function findRelevantGenres(userInput) {
     return new Promise(async function(resolve, reject) {
-        genresList = genres;
+        genresList = JSON.parse(genresConstant);
         let parsedTextObject = await TextAnalysis.parseText(userInput)
         let input = parsedTextObject.adjectives.concat(parsedTextObject.nouns, parsedTextObject.places, parsedTextObject.people);
+        if (input.length === 0) {
+            $("#status-container").attr("class", "hidden")
+            $("#movies").text("*Please enter a longer search, this query will receive no results")
+            resolve(false);
+        }
         let wordArrayTwo = await TextAnalysis.getSimilarWords(input);
         for (let i = 0; i < genresList.length; i++) {
             genresList[i].wordArray = await TextAnalysis.getSimilarWords(genresList[i].wordArray);
             genresList[i].score = TextAnalysis.scoreWordArrayByWordArray(genresList[i].wordArray.slice(0, 200), wordArrayTwo) * TextAnalysis.multiplyByGenre(genresList[i].id, userInput);
             genresById[genresList[i].id].score = genresList[i].score 
+            step++
+            renderStatus();
         }
         genresList.sort(function (a, b) {
             return b.score - a.score;
@@ -359,6 +366,8 @@ async function findRelevantGenres(userInput) {
         console.log(genresList)
         let topTwoGenres = [genresList[0], genresList[1]]
         console.log(topTwoGenres)
+        step++
+        await renderStatus()
         resolve(topTwoGenres);
     })
 }
@@ -385,18 +394,20 @@ var TMDB = {
     getMoviesByGenre: async function(genreID) {
         return new Promise(async function (resolve, reject) {
             let titles = [];
-            for (let i = 1; i <= 4; i++) {
+            for (let i = 1; i <= 5; i++) {
                 let data = { id: genreID, page: i };
                 console.log(data)
-                let titlesToConcat = await getMoviesByGenre(data)
-                titles = titles.concat(titlesToConcat);
-                // let sendCall = firebase.functions().httpsCallable("getMoviesByGenre");
-                // let titlesToConcat
-                // await sendCall(data).then(function(result) {
-                //     console.log(result)
-                //     titlesToConcat = result.data;
-                //     titles = titles.concat(titlesToConcat);
-                // })
+                // let titlesToConcat = await getMoviesByGenre(data)
+                // titles = titles.concat(titlesToConcat);
+                step++
+                let rendered = await renderStatus()
+                let sendCall = firebase.functions().httpsCallable("getMoviesByGenre");
+                let titlesToConcat
+                await sendCall(data).then(function(result) {
+                    console.log(result)
+                    titlesToConcat = result.data;
+                    titles = titles.concat(titlesToConcat);
+                })
             }
             console.log(titles)
             resolve(titles)
@@ -404,37 +415,37 @@ var TMDB = {
     }
 }
 
-function getMoviesByGenre(data) {
-    return new Promise(function (resolve, reject) {
-        var dataParsed = data;
-        var genreID = dataParsed.id;
-        var page = dataParsed.page;
-        var apiKey = "c07a02e77846bc61b3a6ece1fabeeee2";
-        var movies = []
-        var url = "https://api.themoviedb.org/3/discover/movie?api_key=" + apiKey + "&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=" + page + "&primary_release_date.lte=2018-07-10&vote_average.gte=6&with_genres=" + genreID
-        var xhttp = new XMLHttpRequest;
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                let results = JSON.parse(xhttp.responseText).results;
-                console.log(results)
-                for (let result of results) {
-                    movies.push({ title: result.title, year: parseInt(result.release_date.substring(0, 4)), plot: result.overview, id: result.id, genres: result.genre_ids })
-                }
-                console.log(movies)
-                resolve(movies)
-            }
-        };
-        xhttp.open("GET", url, true);
-        xhttp.send()
+// function getMoviesByGenre(data) {
+//     return new Promise(function (resolve, reject) {
+//         var dataParsed = data;
+//         var genreID = dataParsed.id;
+//         var page = dataParsed.page;
+//         var apiKey = "";
+//         var movies = []
+//         var url = "https://api.themoviedb.org/3/discover/movie?api_key=" + apiKey + "&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=" + page + "&primary_release_date.lte=2018-07-10&vote_average.gte=6&with_genres=" + genreID
+//         var xhttp = new XMLHttpRequest;
+//         xhttp.onreadystatechange = function () {
+//             if (this.readyState == 4 && this.status == 200) {
+//                 let results = JSON.parse(xhttp.responseText).results;
+//                 console.log(results)
+//                 for (let result of results) {
+//                     movies.push({ title: result.title, year: parseInt(result.release_date.substring(0, 4)), plot: result.overview, id: result.id, genres: result.genre_ids })
+//                 }
+//                 console.log(movies)
+//                 resolve(movies)
+//             }
+//         };
+//         xhttp.open("GET", url, true);
+//         xhttp.send()
 
-    })
-}
+//     })
+// }
 
 // function getKeywords(data) {
 //     return new Promise(async function (resolve, reject) {
 //         var dataParsed = JSON.parse(data);
 //         var movieID = dataParsed.id;
-//         var apiKey = "c07a02e77846bc61b3a6ece1fabeeee2";
+//         var apiKey = "";
 //         var keywords = []
 //         var url = "https://api.themoviedb.org/3/movie/" + movieID + "/keywords?api_key=" + apiKey
 //         var xhttp = new XMLHttpRequest;
@@ -467,6 +478,7 @@ function scoreMoviesByGenre(movie) {
     }
     return score;
 }
+var step = 0;
 
 async function findTopThreeMovies(genreIdArray, userInput) {
     return new Promise(async function (resolve, reject) {
@@ -501,6 +513,8 @@ async function findTopThreeMovies(genreIdArray, userInput) {
             else {
                 movies[j].score = scoreMoviesByGenre(movies[j])
             }
+            step++
+            await renderStatus();
         }
         movies.sort(function(a, b) {
             return b.score - a.score;
@@ -515,18 +529,42 @@ async function findTopThreeMovies(genreIdArray, userInput) {
             b++;
         }
         let topThreeTitles = [movies[0], movies[a], movies[b]]
+        step++
+        await renderStatus();
         resolve(topThreeTitles);
+    })
+}
+
+var statusBar = $("#status-bar")
+
+function renderStatus() {
+    return new Promise(function(resolve, reject) {
+        let percentage = Math.floor(step / 230 * 100) + "%";
+        console.log(percentage)
+        statusBar.css("width", percentage).promise().done(function() {
+            console.log("Think this is done")
+            resolve(true)
+        })
+        statusBar.text(percentage);
     })
 }
 
 async function search(input) {
     return new Promise(async function(resolve, reject) {
+        $("#status-container").attr("class", "")
         var topTwoGenres = await findRelevantGenres(input)
-        topTwoGenres = topTwoGenres.map((x) => { return x.id })
-        console.log(topTwoGenres)
-        var topThree = await findTopThreeMovies(topTwoGenres, input)
-        console.log(topThree);
-        resolve(topThree);
+        if (topTwoGenres) {
+            topTwoGenres = topTwoGenres.map((x) => { return x.id })
+            console.log(topTwoGenres)
+            var topThree = await findTopThreeMovies(topTwoGenres, input)
+            console.log(step);
+            step = 0
+            genresList = null;
+            renderStatus()
+            console.log(topThree);
+            $("#status-container").attr("class", "hidden")
+            resolve(topThree);
+        }
     })
 }
 
