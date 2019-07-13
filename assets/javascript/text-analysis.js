@@ -8,7 +8,6 @@ var TextAnalysis = {
             nouns: textObject.nouns().toSingular().out("array")
         }
         parsedTextObject.nouns = parsedTextObject.nouns.filter((x) => { return x != "movie" })
-        console.log(parsedTextObject)
         return parsedTextObject;
     },
     getSimilarWords(inputWordArray) {
@@ -33,7 +32,6 @@ var TextAnalysis = {
                         }
                     }
                     if (j === inputWordArray.length - 1) {
-                        console.log(outputWordArray)
                         resolve(outputWordArray);
                     }
                 })
@@ -48,7 +46,6 @@ var TextAnalysis = {
             score += count * word[1];
         }
         score = score / (string.split(" ").length)
-        console.log(score)
         return score;
     },
     scoreStringByString(string, stringToScore, isScoringNouns, isScoringAdjectives) {
@@ -69,17 +66,10 @@ var TextAnalysis = {
         return score;
     },
     scoreWordArrayByWordArray(wordArrayOne, wordArrayTwo) {
-        console.log({words: wordArrayOne})
-        // let wordsOne = [];
-        // let scoresOne = [];
-        // let wordsTwo = [];
-        // let scoresTwo = [];
         let wordsOne = {}
         let wordsTwo = {}
         var score = 0;
         for (let wordDuo of wordArrayOne) {
-            // wordsOne.push(wordDuo[0]);
-            // scoresOne.push(wordDuo[1]);
             if (wordsOne.hasOwnProperty(wordDuo[0])) {
                 wordsOne[wordDuo[0]] += wordDuo[1];
             }
@@ -87,10 +77,7 @@ var TextAnalysis = {
                 wordsOne[wordDuo[0]] = wordDuo[1];
             }
         }
-        console.log(wordArrayOne.length)
         for (let wordDuo of wordArrayTwo) {
-            // wordsTwo.push(wordDuo[0]);
-            // scoresTwo.push(wordDuo[1]);
             if (wordsTwo.hasOwnProperty(wordDuo[0])) {
                 wordsTwo[wordDuo[0]] += wordDuo[1];
             }
@@ -98,26 +85,12 @@ var TextAnalysis = {
                 wordsTwo[wordDuo[0]] = wordDuo[1];
             }
         }
-        console.log(wordsOne);
-        console.log(wordsTwo)
         for (let i = 0; i < wordArrayOne.length; i++) {
-            // let twoIndex = wordsTwo.indexOf(wordsOne[oneIndex]);
-            // if (twoIndex > -1) {
-            //     score = score + scoresOne[oneIndex] + scoresTwo[twoIndex]
-            //     wordsTwo.splice(twoIndex, 1);
-            //     scoresTwo.splice(twoIndex, 1);
-            // }
             if (wordsTwo.hasOwnProperty(wordArrayOne[i][0])) {
                 score += wordsTwo[wordArrayOne[i][0]]
             }
         }
         for (let j = 0; j < wordArrayTwo.length; j++) {
-            // let oneIndex = wordsOne.indexOf(wordsTwo[twoIndex]);
-            // if (oneIndex > -1) {
-            //     score = score + scoresOne[oneIndex] + scoresTwo[twoIndex]
-            //     wordsOne.splice(oneIndex, 1);
-            //     scoresOne.splice(oneIndex, 1);
-            // }
             if (wordsOne.hasOwnProperty(wordArrayTwo[j][0])) {
                 score += wordsOne[wordArrayTwo[j][0]]
             }
@@ -131,7 +104,6 @@ var TextAnalysis = {
             let parsedKeywordObject = this.parseText(keyword);
             keywordsParsed = keywordsParsed.concat(parsedKeywordObject.adjectives, parsedKeywordObject.nouns, parsedKeywordObject.places);
         }
-        console.log(keywordsParsed)
         return keywordsParsed;
     },
     multiplyByGenre(genreID, userInput) {
@@ -363,9 +335,7 @@ async function findRelevantGenres(userInput) {
         genresList.sort(function (a, b) {
             return b.score - a.score;
         })
-        console.log(genresList)
         let topTwoGenres = [genresList[0], genresList[1]]
-        console.log(topTwoGenres)
         step++
         await renderStatus()
         resolve(topTwoGenres);
@@ -377,12 +347,10 @@ var TMDB = {
         return new Promise(async function(resolve, reject) {
             if (movieID) {
                 let data = {id: movieID};
-                console.log(data)
                 let sendCall = firebase.functions().httpsCallable("getKeywords");
                 let keywords
                 sendCall(data).then(function(result) {
                     keywords = result.data
-                    console.log(keywords)
                     resolve(keywords);
                 });
             }
@@ -396,75 +364,20 @@ var TMDB = {
             let titles = [];
             for (let i = 1; i <= 5; i++) {
                 let data = { id: genreID, page: i };
-                console.log(data)
-                // let titlesToConcat = await getMoviesByGenre(data)
-                // titles = titles.concat(titlesToConcat);
                 step++
                 let rendered = await renderStatus()
                 let sendCall = firebase.functions().httpsCallable("getMoviesByGenre");
                 let titlesToConcat
                 await sendCall(data).then(function(result) {
-                    console.log(result)
                     titlesToConcat = result.data;
                     titles = titles.concat(titlesToConcat);
                 })
             }
-            console.log(titles)
             resolve(titles)
         })
     }
 }
 
-// function getMoviesByGenre(data) {
-//     return new Promise(function (resolve, reject) {
-//         var dataParsed = data;
-//         var genreID = dataParsed.id;
-//         var page = dataParsed.page;
-//         var apiKey = "";
-//         var movies = []
-//         var url = "https://api.themoviedb.org/3/discover/movie?api_key=" + apiKey + "&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=" + page + "&primary_release_date.lte=2018-07-10&vote_average.gte=6&with_genres=" + genreID
-//         var xhttp = new XMLHttpRequest;
-//         xhttp.onreadystatechange = function () {
-//             if (this.readyState == 4 && this.status == 200) {
-//                 let results = JSON.parse(xhttp.responseText).results;
-//                 console.log(results)
-//                 for (let result of results) {
-//                     movies.push({ title: result.title, year: parseInt(result.release_date.substring(0, 4)), plot: result.overview, id: result.id, genres: result.genre_ids })
-//                 }
-//                 console.log(movies)
-//                 resolve(movies)
-//             }
-//         };
-//         xhttp.open("GET", url, true);
-//         xhttp.send()
-
-//     })
-// }
-
-// function getKeywords(data) {
-//     return new Promise(async function (resolve, reject) {
-//         var dataParsed = JSON.parse(data);
-//         var movieID = dataParsed.id;
-//         var apiKey = "";
-//         var keywords = []
-//         var url = "https://api.themoviedb.org/3/movie/" + movieID + "/keywords?api_key=" + apiKey
-//         var xhttp = new XMLHttpRequest;
-//         xhttp.onreadystatechange = function () {
-//             if (this.readyState == 4 && this.status == 200) {
-//                 let results = JSON.parse(xhttp.responseText).keywords;
-//                 console.log(results)
-//                 for (let result of results) {
-//                     keywords.push(result.name)
-//                 }
-//                 console.log(keywords)
-//                 // resolve(keywords)
-//             }
-//         };
-//         xhttp.open("GET", url, true);
-//         await xhttp.send()
-//         resolve(keywords)
-//     })
-// }
 function scoreMoviesByGenre(movie) {
     score = 0;
     if (movie.genres) {
@@ -483,26 +396,14 @@ var step = 0;
 async function findTopThreeMovies(genreIdArray, userInput) {
     return new Promise(async function (resolve, reject) {
         let movies = await TMDB.getMoviesByGenre(genreIdArray[0]);
-        console.log(1)
         for (let i = 1; i < genreIdArray.length; i++) {
-            console.log(2)
             moviesToConcat = await TMDB.getMoviesByGenre(genreIdArray[i]);
             movies = movies.concat(moviesToConcat);
         }
-        console.log(movies)
         let parsedTextObject = await TextAnalysis.parseText(userInput)
         let input = parsedTextObject.adjectives.concat(parsedTextObject.nouns, parsedTextObject.places, parsedTextObject.people);
         let wordArrayTwo = await TextAnalysis.getSimilarWords(input);
         for (let j = 0; j < movies.length; j++) {
-            // let keywordsRaw = await TMDB.getKeywords(movies[j].id);
-            // if (keywordsRaw) {
-            //     let keywords = TextAnalysis.parseKeywords(keywordsRaw);
-            //     let wordArrayOne = await TextAnalysis.getSimilarWords(keywords);
-            //     movies[j].score = TextAnalysis.scoreWordArrayByWordArray(wordArrayOne, wordArrayTwo);
-            // }
-            // else {
-            //     movies[j].score = 0
-            // }
             let parsedPlotObject = TextAnalysis.parseText(movies[j].plot)
             let inputPlot = parsedPlotObject.adjectives.concat(parsedPlotObject.nouns, parsedPlotObject.places);
             if (inputPlot.length > 0) {
@@ -519,7 +420,6 @@ async function findTopThreeMovies(genreIdArray, userInput) {
         movies.sort(function(a, b) {
             return b.score - a.score;
         })
-        console.log(movies)
         let a = 1;
         while (movies[a].title === movies[0].title) {
             a++;
@@ -540,9 +440,7 @@ var statusBar = $("#status-bar")
 function renderStatus() {
     return new Promise(function(resolve, reject) {
         let percentage = Math.floor(step / 230 * 100) + "%";
-        console.log(percentage)
         statusBar.css("width", percentage).promise().done(function() {
-            console.log("Think this is done")
             resolve(true)
         })
         statusBar.text(percentage);
@@ -555,17 +453,13 @@ async function search(input) {
         var topTwoGenres = await findRelevantGenres(input)
         if (topTwoGenres) {
             topTwoGenres = topTwoGenres.map((x) => { return x.id })
-            console.log(topTwoGenres)
             var topThree = await findTopThreeMovies(topTwoGenres, input)
-            console.log(step);
             step = 0
             genresList = null;
             renderStatus()
-            console.log(topThree);
-            $("#status-container").attr("class", "hidden")
+             $("#status-container").attr("class", "hidden")
             resolve(topThree);
         }
     })
 }
 
-// test()
