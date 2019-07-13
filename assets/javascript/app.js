@@ -294,7 +294,7 @@ function renderMovie(movie){
  * **/
 function getMoviesInfo(movies){
     moviesSearched = [];
-
+    var countMovies = 0;
     
     var queryParams = {};
     queryParams.apikey = "trilogy";
@@ -311,13 +311,16 @@ function getMoviesInfo(movies){
         }).then(function (result){
     
             if(result.Error) {
+                console.log(movie.title);
                 console.log(result.Error);
             }
             else{
-                //console.log(result);
-                result.id_themoviedb = movie.id;
-                moviesSearched.push(result);
-                renderMovie(result);
+                if(countMovies < 4){
+                    result.id_themoviedb = movie.id;
+                    moviesSearched.push(result);
+                    renderMovie(result);
+                }
+                countMovies++;
             }
         });    
     });
