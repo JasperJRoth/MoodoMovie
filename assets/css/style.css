@@ -221,3 +221,13 @@ p {
 .hidden {
     display: none !important;
 }
+
+@media screen and (max-width: 466px){
+    #movies {
+        justify-content: center;
+    }
+
+    #movies .card{
+        width: 100%;
+    }
+}
