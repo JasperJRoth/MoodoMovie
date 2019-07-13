@@ -1,3 +1,12 @@
+@import url('https://fonts.googleapis.com/css?family=Audiowide&display=swap');
+
+#watchedList{
+    display: none;
+}
+.displayBlock{
+    display: "block";
+}
+
 #movies {
     display: flex;
     flex-wrap: wrap;
@@ -16,10 +25,11 @@
     filter: brightness(50%);
 }
 
-.dp-btn:hover {
+.dp-btn:hover, .btn-floating:hover {
     filter: brightness(50%) !important;
     cursor: pointer;
 }
+
 
 #movies .card{
     width: 30%;
@@ -29,6 +39,27 @@
 
 #movies .card p{
     line-height: 1.5em;
+}
+
+#status-container {
+    width: 200px;
+    height: 50px;
+    border: 2px solid #3A1CA6 ;
+    padding: 5px;
+    border-radius: 10px;
+    display: block;
+    margin: 0px auto;
+}
+
+#status-bar {
+    width: 0%;
+    height: 100%;
+    background-color: #3A1CA6 ;
+    border-radius: 10px;
+    color: #eeeeee;
+    font-weight: 600;
+    text-align: center;
+    overflow: hidden;
 }
 
 
@@ -41,6 +72,108 @@
     line-height: 1.5em;
 }
 
+#movie-detail .card-image{
+    background-color: black;  
+}
+
+#movie-detail .general-info{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.card-title{
+    font-weight: bold !important;  
+    color: #000;  
+}
+.card-title-detail{
+    color: rgba(0,0,0,0.6);
+    font-size: 16px;
+}
+
+.card-content{
+    color: rgba(0,0,0,0.6);
+}
+.card-stacked{
+    width: 100%;
+}
+.awards{
+    color: #b6b708;
+}
+.production{
+    color: #000;
+}
+.language{
+    color: blue;
+}
+.genre{
+    color: #000;
+}
+.clock{
+    color: red;
+}
+.country{
+    color: green;
+}
+#play-icon{
+    font-size: 14px;
+}
+
+#plot-header{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    border-bottom: 1px solid #c5c5c5;    
+    padding-bottom: 5px;
+}
+
+#plot-header span{
+    font-size: 18px;
+    margin-top: 10px;
+    color: #000;
+    align-self: end;
+    font-weight: bold;
+
+}
+
+#play-btn{
+    margin-top: 10px;
+    text-align: center;
+    justify-self: right;
+    align-content: start;
+}
+
+#plot{
+    width: 100%;
+    font-size: 18px;
+    
+    padding-top: 20px;
+}
+
+#crew{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    margin: 20px 0;
+    
+}
+#crew p:last-child{
+    grid-column-start: span 2;
+    
+}
+#crew p::first-line{
+    color: #000;
+}
+#crew-header{
+    font-size: 18px;
+    margin-top: 20px;
+    color: #000;
+    align-self: end;
+    font-weight: bold;
+    border-bottom: 1px solid #c5c5c5;
+    width: 100%;
+    padding-bottom: 5px;
+
+}
 #search-button{
     cursor: pointer;
 }
@@ -63,15 +196,15 @@ p {
 
 .dp-btn {
     width: 150px;
-    height: 40px;
     margin: auto 5px;
     text-align: center;
-    padding: 13px 0px;
+    padding: 10px 0px;
     border-radius: 5px;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
 }
 
 .dp-brand-name {
+    font-family: 'Audiowide', cursive;
     font-size: 28px;
     grid-column: 2 / 3;
     color: #eeeeee;
@@ -83,4 +216,28 @@ p {
     display: flex;
     align-content: center;
     justify-content: flex-end;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.streamicon {
+    height: 50px;
+    width: 50px;
+    background: black;
+}
+
+.spacericon {
+    width:15px;
+}
+
+@media screen and (max-width: 466px){
+    #movies {
+        justify-content: center;
+    }
+
+    #movies .card{
+        width: 100%;
+    }
 }
