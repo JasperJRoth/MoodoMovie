@@ -132,6 +132,15 @@ var TextAnalysis = {
         }
         console.log(keywordsParsed)
         return keywordsParsed;
+    },
+    multiplyByGenre(genreID, userInput) {
+        let multiplier = 1;
+        for (let word of genresById[genreID].multiplierArray) {
+            if (userInput.indexOf(word) > -1) {
+                multiplier++
+            }
+        }
+        return multiplier
     }
 }
 
@@ -231,75 +240,93 @@ var genres = [
 var genresById = {
     "28": {
         "name": "Action",
-        "wordArray": ['action', 'police', 'army', 'fight', 'shoot', 'punch', 'kick', 'die', 'kill', 'tough', 'strong', 'angry']
+        "wordArray": ['action', 'police', 'army', 'fight', 'shoot', 'punch', 'kick', 'die', 'kill', 'tough', 'strong', 'angry'],
+        multiplierArray: ['action', 'shoot', 'fight', 'army']
     },
     "12": {
         "name": "Adventure",
-        "wordArray": ['fun', 'travel', 'action', 'adventure', 'swashbuckling', 'treasure', 'villain', 'happy']
+        "wordArray": ['fun', 'travel', 'action', 'adventure', 'swashbuckling', 'treasure', 'villain', 'happy'],
+        multiplierArray: ['adventure', 'swashbuckling', 'evil', 'action']
     },
     "16": {
         "name": "Animation",
-        "wordArray": ['animation', 'children', 'nostalgia', 'fun', 'disney', 'pixar', 'fairy tale', 'happy']
+        "wordArray": ['animation', 'children', 'nostalgia', 'fun', 'disney', 'pixar', 'fairy tale', 'happy'],
+        multiplierArray: ['animation', 'family', 'child', 'kid']
     },
     "35": {
         "name": "Comedy",
-        "wordArray": ['laugh', 'comedy', 'fun', 'happy', 'joke', 'irreverant', 'dumb']
+        "wordArray": ['laugh', 'comedy', 'fun', 'happy', 'joke', 'irreverant', 'dumb'],
+        multiplierArray: ['laugh', 'comedy', 'funny', 'joke']
     },
     "80": {
         "name": "Crime",
-        "wordArray": ['police', 'law', 'crime', 'robbery', 'murder', 'tough', 'action', 'criminal', 'gangster']
+        "wordArray": ['police', 'law', 'crime', 'robbery', 'murder', 'tough', 'action', 'criminal', 'gangster'],
+        multiplierArray: ['crime', 'robber', 'gangster', 'criminal']
     },
     "99": {
         "name": "Documentary",
-        "wordArray": ["documentary", "non-fiction", 'real world', 'people', 'story', 'history']
+        "wordArray": ["documentary", "non-fiction", 'real world', 'people', 'story', 'history'],
+        multiplierArray: ['documentary', 'real', 'history', 'true']
     },
     "18": {
         "name": "Drama",
-        "wordArray": ['sad', 'drama', 'serious', 'family', 'love', 'angry', 'bittersweet', 'prestige', 'awards']
+        "wordArray": ['sad', 'drama', 'serious', 'family', 'love', 'angry', 'bittersweet', 'prestige', 'awards'],
+        multiplierArray: ['drama', 'serious', 'award', 'prestige']
     },
     "10751": {
         "name": "Family",
-        "wordArray": ['family', 'children', 'fun', 'young', 'happy', 'animation']
+        "wordArray": ['family', 'children', 'fun', 'young', 'happy', 'animation'],
+        multiplierArray: ['family', 'children', 'kid', 'animation']
     },
     "14": {
         "name": "Fantasy",
-        "wordArray": ['fantasy', 'magic', 'knight', 'dragon', 'speculative', 'fun', 'dramatic', 'adventure']
+        "wordArray": ['fantasy', 'magic', 'knight', 'dragon', 'speculative', 'fun', 'dramatic', 'adventure'],
+        multiplierArray: ['fantasy', 'magic', 'adventure', 'adventure']
     },
     "36": {
         "name": "History",
-        "wordArray": ['history', 'real world', 'non-fiction', 'prestige', 'awards', 'drama']
+        "wordArray": ['history', 'real world', 'non-fiction', 'prestige', 'awards', 'drama'],
+        multiplierArray: ['history', 'true', 'award', 'real']
     },
     "27": {
         "name": "Horror",
-        "wordArray": ['scary', 'spooky', 'monster', 'death', 'horror', 'darkness']
+        "wordArray": ['scary', 'spooky', 'monster', 'death', 'horror', 'darkness', 'gore', 'blood', 'death'],
+        multiplierArray: ['horror', 'gore', 'scary', 'monster']
     },
     "10402": {
         "name": "Music",
-        "wordArray": ["music", 'band', 'song', 'happy', 'disney', 'fun', 'dance']
+        "wordArray": ["music", 'band', 'song', 'happy', 'disney', 'fun', 'dance', 'musical'],
+        multiplierArray: ['musical', 'music', 'band', 'dance']
     },
     "9648": {
         "name": "Mystery",
-        "wordArray": ['mystery', 'detective', 'clues', 'murder', 'sherlock holmes', 'deduction', 'crime', 'drama', 'comedy']
+        "wordArray": ['mystery', 'detective', 'clues', 'murder', 'sherlock holmes', 'deduction', 'crime', 'drama', 'comedy'],
+        multiplierArray: ['mystery', 'detective', 'sherlock', 'murder']
     },
     "10749": {
         "name": "Romance",
-        "wordArray": ['romance', 'love', 'sad', 'happy', 'sex', 'marraige', 'meet cute']
+        "wordArray": ['romance', 'love', 'sad', 'happy', 'sex', 'marraige', 'meet cute', 'comedy'],
+        multiplierArray: ['romance', 'romantic', 'love', 'marraige']
     },
     "878": {
         "name": "Science Fiction",
-        "wordArray": ['science', 'science fiction', 'robot', 'space', 'fantasy', 'future', 'technology', 'speculative']
+        "wordArray": ['science', 'science fiction', 'robot', 'space', 'fantasy', 'future', 'technology', 'speculative'],
+        multiplierArray: ['science', 'space', 'future', 'technology']
     },
     "53": {
         "name": "Thriller",
-        "wordArray": ['thriller', 'exciting', 'drama', 'serious', 'horror', 'cerebral']
+        "wordArray": ['thriller', 'exciting', 'drama', 'serious', 'horror', 'cerebral'],
+        multiplierArray: ['thriller', 'exciting', 'drama', 'horror']
     },
     "10752": {
         "name": "War",
-        "wordArray": ['war', 'history', 'army', 'soldier', 'non-fiction', 'marines', 'navy', 'world war']
+        "wordArray": ['war', 'history', 'army', 'soldier', 'non-fiction', 'marines', 'navy', 'world war'],
+        multiplierArray: ['war', 'history', 'army', 'soldier']
     },
     "37": {
         "name": "Western",
-        "wordArray": ['western', 'cowboy', 'sharpshooter', 'wild west', 'sherrif', 'native american', 'mexican']
+        "wordArray": ['western', 'cowboy', 'sharpshooter', 'wild west', 'sherrif', 'native american', 'mexican'],
+        multiplierArray: ['western', 'cowboy', 'sheriff', 'shoot']
     }
 }
 
@@ -313,7 +340,7 @@ async function findRelevantGenres(userInput) {
         let wordArrayTwo = await TextAnalysis.getSimilarWords(input);
         for (let i = 0; i < genresList.length; i++) {
             genresList[i].wordArray = await TextAnalysis.getSimilarWords(genresList[i].wordArray);
-            genresList[i].score = TextAnalysis.scoreWordArrayByWordArray(genresList[i].wordArray.slice(0,200), wordArrayTwo)
+            genresList[i].score = TextAnalysis.scoreWordArrayByWordArray(genresList[i].wordArray.slice(0, 200), wordArrayTwo) * TextAnalysis.multiplyByGenre(genresList[i].id, userInput);
             genresById[genresList[i].id].score = genresList[i].score 
         }
         genresList.sort(function (a, b) {
