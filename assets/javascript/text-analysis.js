@@ -427,7 +427,7 @@ function scoreMoviesByGenre(movie) {
 }
 var step = 0;
 
-async function findTopThreeMovies(genreIdArray, userInput) {
+async function findTopFiveMovies(genreIdArray, userInput) {
     return new Promise(async function (resolve, reject) {
         let movies = await TMDB.getMoviesByGenre(genreIdArray[0]);
         for (let i = 1; i < genreIdArray.length; i++) {
@@ -459,13 +459,21 @@ async function findTopThreeMovies(genreIdArray, userInput) {
             a++;
         }
         let b = a + 1;
-        while (movies[b].title === movies[a].title || movies[b].title === movies[0]) {
+        while (movies[b].title === movies[a].title || movies[b].title === movies[0].title) {
             b++;
         }
-        let topThreeTitles = [movies[0], movies[a], movies[b]]
+        let c = b + 1;
+        while (movies[c].title === movies[a].title || movies[c].title === movies[0].title || movies[c].title === movies[b].title) {
+            c++;
+        }
+        let d = c + 1;
+        while (movies[d].title === movies[a].title || movies[d].title === movies[0].title || movies[d].title === movies[b].title || movies[d].title === movies[c].title) {
+            d++;
+        }
+        let TopFiveTitles = [movies[0], movies[a], movies[b], movies[c], movies[d]]
         step++
         await renderStatus();
-        resolve(topThreeTitles);
+        resolve(TopFiveTitles);
     })
 }
 
@@ -487,12 +495,12 @@ async function search(input) {
         var topTwoGenres = await findRelevantGenres(input)
         if (topTwoGenres) {
             topTwoGenres = topTwoGenres.map((x) => { return x.id })
-            var topThree = await findTopThreeMovies(topTwoGenres, input)
+            var TopFive = await findTopFiveMovies(topTwoGenres, input)
             step = 0
             genresList = null;
             renderStatus()
              $("#status-container").attr("class", "hidden")
-            resolve(topThree);
+            resolve(TopFive);
         }
     })
 }
