@@ -7,6 +7,7 @@ var TextAnalysis = {
             places: textObject.places().out("array"),
             nouns: textObject.nouns().toSingular().out("array")
         }
+        parsedTextObject.nouns = parsedTextObject.nouns.filter((x) => { return x != "movie" })
         console.log(parsedTextObject)
         return parsedTextObject;
     },
@@ -137,6 +138,15 @@ var TextAnalysis = {
         let multiplier = 1;
         for (let word of genresById[genreID].multiplierArray) {
             if (userInput.indexOf(word) > -1) {
+                multiplier++
+            }
+        }
+        return multiplier
+    },
+    multiplyByInput(input, plot) {
+        let multiplier = 1;
+        for (let word of input) {
+            if (plot.indexOf(word) > -1) {
                 multiplier++
             }
         }
@@ -336,7 +346,7 @@ async function findRelevantGenres(userInput) {
     return new Promise(async function(resolve, reject) {
         genresList = genres;
         let parsedTextObject = await TextAnalysis.parseText(userInput)
-        let input = parsedTextObject.adjectives.concat(parsedTextObject.nouns, parsedTextObject.places);
+        let input = parsedTextObject.adjectives.concat(parsedTextObject.nouns, parsedTextObject.places, parsedTextObject.people);
         let wordArrayTwo = await TextAnalysis.getSimilarWords(input);
         for (let i = 0; i < genresList.length; i++) {
             genresList[i].wordArray = await TextAnalysis.getSimilarWords(genresList[i].wordArray);
@@ -375,7 +385,7 @@ var TMDB = {
     getMoviesByGenre: async function(genreID) {
         return new Promise(async function (resolve, reject) {
             let titles = [];
-            for (let i = 1; i <= 3; i++) {
+            for (let i = 1; i <= 4; i++) {
                 let data = { id: genreID, page: i };
                 console.log(data)
                 let titlesToConcat = await getMoviesByGenre(data)
@@ -389,7 +399,6 @@ var TMDB = {
                 // })
             }
             console.log(titles)
-            // document.write(JSON.stringify(titles))
             resolve(titles)
         })
     }
@@ -470,7 +479,7 @@ async function findTopThreeMovies(genreIdArray, userInput) {
         }
         console.log(movies)
         let parsedTextObject = await TextAnalysis.parseText(userInput)
-        let input = parsedTextObject.adjectives.concat(parsedTextObject.nouns, parsedTextObject.places);
+        let input = parsedTextObject.adjectives.concat(parsedTextObject.nouns, parsedTextObject.places, parsedTextObject.people);
         let wordArrayTwo = await TextAnalysis.getSimilarWords(input);
         for (let j = 0; j < movies.length; j++) {
             // let keywordsRaw = await TMDB.getKeywords(movies[j].id);
@@ -487,6 +496,7 @@ async function findTopThreeMovies(genreIdArray, userInput) {
             if (inputPlot.length > 0) {
                 let wordArrayOne = await TextAnalysis.getSimilarWords(inputPlot);
                 movies[j].score = TextAnalysis.scoreWordArrayByWordArray(wordArrayOne, wordArrayTwo) + scoreMoviesByGenre(movies[j]);
+                movies[j].score = movies[j].score * TextAnalysis.multiplyByInput(input, movies[j].plot)
             }
             else {
                 movies[j].score = scoreMoviesByGenre(movies[j])
