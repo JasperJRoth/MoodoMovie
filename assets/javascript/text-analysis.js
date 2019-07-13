@@ -12,21 +12,55 @@ var TextAnalysis = {
     },
     getSimilarWords(inputWordArray) {
         return new Promise(function(resolve, reject) {
+            try {
+                var outputWordArray = [];
+                for (let j = 0; j < inputWordArray.length; j++) {
+                    let word = inputWordArray[j];
+                    outputWordArray.push([word, 3])
+                    var maxscore
+                    $.ajax({
+                        url: "https://api.datamuse.com/words?ml="+word+"&topics=movie",
+                        method: "GET"
+                    }).then(function(response) {
+                        for (let i = 0; i < response.length; i++) {
+                            let item = response[i]
+                            if (i === 0) {
+                                maxscore = item.score
+                            }
+                            let score = item.score/maxscore
+                            if (score > 0) {
+                                outputWordArray.push([item.word, score])
+                            }
+                        }
+                        if (j === inputWordArray.length - 1) {
+                            resolve(outputWordArray);
+                        }
+                    })
+                }
+            }
+            catch(error) {
+                console.log("Your browser is blocking CORS requests which will make our application run slower")
+                getSimilarWordsSafe(inputWordArray)
+            }
+        })
+    },
+    getSimilarWordsSafe(inputWordArray) {
+        return new Promise(function (resolve, reject) {
             var outputWordArray = [];
             for (let j = 0; j < inputWordArray.length; j++) {
                 let word = inputWordArray[j];
                 outputWordArray.push([word, 3])
                 var maxscore
                 $.ajax({
-                    url: "https://api.datamuse.com/words?ml="+word+"&topics=movie",
+                    url: "https://cors-anywhere.herokuapp.com/https://api.datamuse.com/words?ml=" + word + "&topics=movie",
                     method: "GET"
-                }).then(function(response) {
+                }).then(function (response) {
                     for (let i = 0; i < response.length; i++) {
                         let item = response[i]
                         if (i === 0) {
                             maxscore = item.score
                         }
-                        let score = item.score/maxscore
+                        let score = item.score / maxscore
                         if (score > 0) {
                             outputWordArray.push([item.word, score])
                         }

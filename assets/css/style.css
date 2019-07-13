@@ -221,3 +221,20 @@ p {
 .hidden {
     display: none !important;
 }
+
+@media only screen and (max-width: 600px) {
+    .dp-navbar {
+        grid-template-columns: 100%;
+        grid-template-rows: 90px 90px;
+    }
+
+    .dp-brand-name {
+        grid-column: 0 / 1 !important;
+        grid-row: 0 / 1 !important;
+    }
+
+    #buttons-div {
+        grid-column: 0 / 1 !important;
+        grid-row: 1 / 2 !important;
+    }
+}
