@@ -1,21 +1,132 @@
 /**
+ * CONSTANTS 
+ * */
+const WATCHED_ICON = "turned_in";
+const NOT_WATCHED_ICON = "turned_in_not";
+const MSG_TOOLTIP_WATCHED = "Click to mark as watched!";
+const MSG_TOOLTIP_NOT_WATCHED = "Click to mark as NOT watched!";
+
+/**
  * GLOBAL DOM VARIABLES
  */
 var $movies;
 var $movieDetail;
-
+var $watchedListButton;
 
 /**
  * GLOBAL VARIABLES
  */
 var moviesSearched; //stores info for all the movies searched
-var movieSelected = false; //stores the imdbID of the current selected movie
+var moviesWatched = []; //stores the list of movie objects that the user marked as wathed
+var movieSelected = ""; //stores the imdbID of the current selected movie
 
+
+//stores the watched movie in the localStorage
+function storeWatchedList(data){
+    //check if browser supports storage
+    if (typeof(Storage) !== "undefined") {
+        window.localStorage.setItem("watched", JSON.stringify(data));
+    }
+
+    //update the firebase storage
+    //...to be implemented yet!
+
+}
+
+//retrieves the watched movies stored in the localStorage
+function getWatchedListFromLocal(){
+    var data = [];
+    //check if browser supports storage
+    if (typeof(Storage) !== "undefined") {
+        if(localStorage.getItem("watched") !== null){
+            data = JSON.parse(window.localStorage.getItem("watched"));
+            if(data.length ===0) data = [];
+        }
+    }
+
+    return data;
+
+}
+
+//retrieves the watched list stored in the firebase
+function getWatchedListFromDB(user){
+    //...
+}
+
+function toggleWatchedMovie(){
+    movieId = $(this).attr("data-movieid");
+    status = $(this).attr("data-status");
+    watchedListOpen = $("#watched-list-shown").val();
+    
+    //if the status is marked as watched
+    if(status === "yes"){
+        //uncheck (remove item)
+
+        //look for the movie in the list of movies watched
+        for(var i=0; i < moviesWatched.length; i++) {
+            if(moviesWatched[i].imdbID === movieId){
+                movie = moviesWatched[i];
+                moviesWatched.splice(i,1); //remove the movie from the watched list
+                break;
+            }
+        }
+                
+        //change the icon to the unchecked one
+        $(`.data-${movieId}`).children("i").text(NOT_WATCHED_ICON);
+        $(`.data-${movieId}`).attr("data-status","no");
+        $(`.data-${movieId}`).attr("title",MSG_TOOLTIP_WATCHED);
+
+        if(watchedListOpen == "yes"){
+            $(`#${movieId}`).remove();
+        }
+    }
+    else{
+        //check (add item)
+
+        //grab for the movie in the list of movies searched
+        for(var i=0; i < moviesSearched.length; i++) {
+            if(moviesSearched[i].imdbID === movieId){
+                movie = moviesSearched[i];
+                moviesWatched.push(movie); //add the movie in the watched list
+                break;
+            }
+        }
+
+        //change the icon to the checked one
+        $(`.data-${movieId}`).children("i").text(WATCHED_ICON);
+        $(`.data-${movieId}`).attr("data-status","yes");
+        $(`.data-${movieId}`).attr("title",MSG_TOOLTIP_NOT_WATCHED);
+    }
+
+    //update the localStorage
+    storeWatchedList(moviesWatched);
+}
+
+//checks whether or not the user watched the movie
+function userWatchedMovie(imdbID){
+    for(var i=0; i < moviesWatched.length; i++) {
+        if(moviesWatched[i].imdbID === imdbID){
+            return true;
+        }
+    }
+    return false;
+}
+
+//when the user clicks on the Watched List button, here it will render all the movies marked as watched
+function showWatchedList(){
+    $movies.empty();
+    $movieDetail.css("display","none");
+
+    $movies.append($(`<input type="hidden" id="watched-list-shown" value="yes">`));
+    moviesWatched.forEach(movie => {
+        renderMovie(movie);
+    });
+}
 
 function closeDetail(){
     $movies.children('.card').removeClass("movie-hidden");
     $movieDetail.css("display","none");
-    movieSelected = false;
+    movieSelected = "";
 }
 
 
@@ -31,12 +142,48 @@ function getMovieTrailer(id){
             console.log(result.Error);
         }
         else{
-            let $video = $(`<div class="video-container">`);
-            $video.append(`<iframe width="853" height="480" src="//www.youtube.com/embed/${result.results[0].key}?rel=0" frameborder="0" allowfullscreen></iframe>`);
-            $("#movie-detail .card-content").append($video);
+
+            var $btnWrap = $("#play-btn");
+            var $trailerButton = $(`<button class="btn-floating btn-small red">`).html(`<i class="fas fa-play play-icon" id="play-icon"></i>`);
+
+            $trailerButton.magnificPopup({
+                items: {
+                    src: `https://www.youtube.com/watch?v=${result.results[0].key}`
+                },
+                type: 'iframe' // this is default type
+            });
+
+            $btnWrap.append($trailerButton);
+            $btnWrap.append(" Play Trailer");
         }
     });    
     
+}
+
+//creates the toggle button for check/uncheck the watched movie
+function getWatchedActionButton(movieId){
+
+    var $watchedAction = $(`<a class="btn-floating halfway-fab waves-effect waves-light red data-${movieId}">`);
+    var $watchedStatus = $(`<i class="material-icons">`);
+
+
+    if(userWatchedMovie(movieId)){
+        $watchedStatus.text(WATCHED_ICON);
+        $watchedAction.attr("data-status","yes");
+        $watchedAction.attr("title",MSG_TOOLTIP_NOT_WATCHED);
+    }
+    else{
+        $watchedStatus.text(NOT_WATCHED_ICON);
+        $watchedAction.attr("data-status","no");
+        $watchedAction.attr("title",MSG_TOOLTIP_WATCHED);
+    }
+
+    $watchedAction.attr("data-movieid",movieId);
+    $watchedAction.click(toggleWatchedMovie);
+    $watchedAction.append($watchedStatus);
+
+    return $watchedAction;
+         
 }
 
 /**
@@ -49,7 +196,7 @@ function renderMovieDetails(){
     var $cardAction = $("#movie-detail .card-action");
     var $cardImg = $("#movie-detail img");
 
-    if (!movieSelected){
+    if (movieSelected != movieId){
         for(var i=0; i < moviesSearched.length; i++) {
             if(moviesSearched[i].imdbID === movieId){
                 movie = moviesSearched[i];
@@ -59,21 +206,50 @@ function renderMovieDetails(){
 
         var $linkClose = $(`<a href="#">`).text("Close");
         $linkClose.click(closeDetail);
+
         $cardAction.empty();
         $cardAction.append($linkClose);
 
+        var $cardTitle = $(`<span class="card-title">`).text(` ${movie.Title}`);
+        $cardTitle.append($(`<span class="card-title-detail">`).text(` (${movie.Year})`));
+        $cardTitle.prepend(getWatchedActionButton(movieId).attr("class",`btn-floating btn-small red data-${movieId}`));
+         
+        var $cardInfo = $("<div class='general-info'>");
+
         $cardContent.empty();
-        $cardContent.append($(`<span class="card-title">`).text(movie.Title));
-        $cardContent.append($("<p>").html(`${movie.Year} - ${movie.Genre}`));
-        $cardContent.append($("<p>").html(`<i class="fas fa-trophy"></i> ${movie.Awards}`));
-        $cardContent.append($("<p>").html(`<i class="fas fa-globe-americas"></i> ${movie.Language}`));
-        $cardContent.append($("<p>").html(`<i class="fas fa-video"></i> ${movie.Production}`));
-        $cardContent.append($("<p>").html(`Director: ${movie.Director}`));
-        $cardContent.append($("<p>").html(`<br>${movie.Plot}`));
+        
+        $cardContent.append($cardTitle);
+        $cardInfo.append($("<span>").html(`<i class="fas fa-film genre"></i> ${movie.Genre}`));
+        $cardInfo.append($("<span>").html(`<i class="fas fa-globe language"></i> ${movie.Language}`));
+        $cardInfo.append($("<span>").html(`<i class="far fa-clock clock"></i> ${movie.Runtime}`));
+        $cardInfo.append($("<span>").html(`<i class="fas fa-globe-americas country"></i> ${movie.Country}`));
+        $cardInfo.append($("<span>").html(`<i class="fas fa-video production"></i> ${movie.Production}`));
+        $cardInfo.append($("<span>").html(`<i class="fas fa-trophy awards"></i> ${movie.Awards}`));
+
+        $cardContent.append($cardInfo);
+        
+
+        var $plotHeader =$("<div id='plot-header'>");
+        $plotHeader.append($("<span>").text("Overview"))
+        $plotHeader.append($(`<div id="play-btn">`))
+        $cardContent.append($plotHeader);
+
+        $cardContent.append($("<p id='plot'>").html(movie.Plot));
+        
+        var $crew =$("<div id='crew'>");
+        
+        $crew.append($("<p>").html(`Director<br>${movie.Director}`));
+        $crew.append($("<p>").html(`Actors<br>${movie.Actors}`));
+        $crew.append($("<p>").html(`Writer<br>${movie.Writer}`));
+        
+
+        $cardContent.append($("<p id='crew-header'>").text("Crew"));
+        $cardContent.append($crew);
 
         $cardImg.attr("src",movie.Poster);
+
         getMovieTrailer(movie.id_themoviedb);
-        movieSelected = true;
+        movieSelected = movieId;
     
     }
     $movieDetail.css("display","flex");
@@ -95,15 +271,17 @@ function renderMovie(movie){
     $img.click(renderMovieDetails);
         
     $cardImg.append($img);
+    $cardImg.append(getWatchedActionButton(movie.imdbID));
     
     $cardContent.append($("<span class='card-title'>").text(movie.Title));
     $cardContent.append($("<p>").text(movie.Plot));
 
-    $card.attr("id",movie.imdbID)
+    $card.attr("id",movie.imdbID);
     $card.append($cardImg);
     $card.append($cardContent);
 
     $movies.append($card);
+    
 }
 
 /** 
@@ -132,6 +310,7 @@ function getMoviesInfo(movies){
                 console.log(result.Error);
             }
             else{
+                //console.log(result);
                 result.id_themoviedb = movie.id;
                 moviesSearched.push(result);
                 renderMovie(result);
@@ -168,19 +347,30 @@ function hideSignUpButton(){
     $("#signUp").css("display", "none");
 }
 
-//show the things that user is able to do once it is authenticated
-function app(user){
-    console.log(user);
+function hideWatchedListButton(){
+    $watchedListButton.css("display","none"); 
 }
+
+function showWatchedListButton(){
+    $watchedListButton.css("display","block"); 
+}
+
 
 //checks if the user is authenticated
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
         $("#signInOut").text("Sign Out");
         hideSignUpButton();
+        showWatchedListButton();
+
+        //...to be implemented!!
+        //moviesWatched = getWatchedListFromDB(user);
+        //....
+
     } else {
         $("#signInOut").text("Log In");
         showSignUpButton();
+        hideWatchedListButton();
     }
 });
 
@@ -198,6 +388,12 @@ async function searchMovies(){
 $(document).ready(function(){
     $movies = $("#movies");
     $movieDetail = $("#movie-detail");
+    $watchedListButton = $("#watchedList");
+
+    $watchedListButton.click(showWatchedList);
+
+    //get watched list from the local storage
+    moviesWatched = getWatchedListFromLocal();
 
     $("#search-button").click(searchMovies);
     $("#search-input").keypress(event => {
@@ -239,4 +435,7 @@ $(document).ready(function(){
         hideSignUp()
         siteAuth.signUp(email, pass);
     });
+
+    
+
 });
