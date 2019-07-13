@@ -20,20 +20,24 @@ var TextAnalysis = {
                     var maxscore
                     $.ajax({
                         url: "https://api.datamuse.com/words?ml="+word+"&topics=movie",
-                        method: "GET"
-                    }).then(function(response) {
-                        for (let i = 0; i < response.length; i++) {
-                            let item = response[i]
-                            if (i === 0) {
-                                maxscore = item.score
+                        method: "GET",
+                        error: function() {
+                            getSimilarWordsSafe(inputWordArray);  
+                        },
+                        success: response => {
+                            for (let i = 0; i < response.length; i++) {
+                                let item = response[i]
+                                if (i === 0) {
+                                    maxscore = item.score
+                                }
+                                let score = item.score/maxscore
+                                if (score > 0) {
+                                    outputWordArray.push([item.word, score])
+                                }
                             }
-                            let score = item.score/maxscore
-                            if (score > 0) {
-                                outputWordArray.push([item.word, score])
+                            if (j === inputWordArray.length - 1) {
+                                resolve(outputWordArray);
                             }
-                        }
-                        if (j === inputWordArray.length - 1) {
-                            resolve(outputWordArray);
                         }
                     })
                 }
