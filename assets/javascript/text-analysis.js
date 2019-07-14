@@ -1,7 +1,3 @@
-$(document).ready(function() {
-    $("body").attr("class", "dp-background-light-blue ")
-})
-
 var TextAnalysis = {
     parseText(string) {
         let textObject = nlp(string);
