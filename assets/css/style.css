@@ -43,7 +43,6 @@
 
 #status-container {
     width: 200px;
-    height: 50px;
     border: 2px solid #3A1CA6 ;
     padding: 5px;
     border-radius: 10px;
@@ -53,7 +52,7 @@
 
 #status-bar {
     width: 0%;
-    height: 100%;
+    padding: 10px 0px;
     background-color: #3A1CA6 ;
     border-radius: 10px;
     color: #eeeeee;

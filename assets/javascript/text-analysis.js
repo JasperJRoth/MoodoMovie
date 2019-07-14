@@ -1,3 +1,7 @@
+$(document).ready(function() {
+    $("body").attr("class", "dp-background-light-blue ")
+})
+
 var TextAnalysis = {
     parseText(string) {
         let textObject = nlp(string);
@@ -21,58 +25,6 @@ var TextAnalysis = {
                     url: "https://api.datamuse.com/words?ml="+word+"&topics=movie",
                     method: "GET"
                 }).then(function(response) {
-                    for (let i = 0; i < response.length; i++) {
-                        let item = response[i]
-                        if (i === 0) {
-                            maxscore = item.score
-                        }
-                        let score = item.score / maxscore
-                        if (score > 0) {
-                            outputWordArray.push([item.word, score])
-                        }
-                    }
-                    if (j === inputWordArray.length - 1) {
-                        resolve(outputWordArray);
-                    }
-                })
-                // let xhttp = new XMLHttpRequest;
-                // let url = "https://api.datamuse.com/words?ml=" + word + "&topics=movie"
-                // xhttp.onreadystatechange = function() {
-                //     if (this.readyState == 4 && this.status == 200) {
-                //         let results = JSON.parse(xhttp.responseText).results;
-                //         for (let i = 0; i < results.length; i++) {
-                //             let item = results[i]
-                //             if (i === 0) {
-                //                 maxscore = item.score
-                //             }
-                //             let score = item.score/maxscore
-                //             if (score > 0) {
-                //                 outputWordArray.push([item.word, score])
-                //             }
-                //         }
-                //         if (j === inputWordArray.length - 1) {
-                //             resolve(outputWordArray);
-                //         }
-                //     }
-                // }
-                // xhttp.open("GET", url, true);
-                // xhttp.setRequestHeader("Access-Control-Allow-Origin", "*")
-                // xhttp.setRequestHeader("Access-Control-Allow-Methods", "GET")
-                // xhttp.send()
-            }
-        })
-    },
-    getSimilarWordsSafe(inputWordArray) {
-        return new Promise(function (resolve, reject) {
-            var outputWordArray = [];
-            for (let j = 0; j < inputWordArray.length; j++) {
-                let word = inputWordArray[j];
-                outputWordArray.push([word, 3])
-                var maxscore
-                $.ajax({
-                    url: "https://cors-anywhere.herokuapp.com/https://api.datamuse.com/words?ml=" + word + "&topics=movie",
-                    method: "GET"
-                }).then(function (response) {
                     for (let i = 0; i < response.length; i++) {
                         let item = response[i]
                         if (i === 0) {
@@ -161,7 +113,7 @@ var TextAnalysis = {
     multiplyByGenre(genreID, userInput) {
         let multiplier = 1;
         for (let word of genresById[genreID].multiplierArray) {
-            if (userInput.indexOf(word) > -1) {
+            if (userInput.indexOf(" " + word + " ") > -1) {
                 multiplier += 4
             }
         }
@@ -170,8 +122,8 @@ var TextAnalysis = {
     multiplyByInput(input, plot) {
         let multiplier = 1;
         for (let word of input) {
-            if (plot.indexOf(word) > -1) {
-                multiplier += 4
+            if (plot.indexOf(" " + word + " ") > -1) {
+                multiplier += 5
             }
         }
         return multiplier
@@ -285,7 +237,7 @@ var genresById = {
     "16": {
         "name": "Animation",
         "wordArray": ['animation', 'children', 'nostalgia', 'fun', 'disney', 'pixar', 'fairy tale', 'happy'],
-        multiplierArray: ['animat', 'family', 'cartoon', 'kid']
+        multiplierArray: ['animated', 'family', 'cartoon', 'kid']
     },
     "35": {
         "name": "Comedy",
@@ -310,7 +262,7 @@ var genresById = {
     "10751": {
         "name": "Family",
         "wordArray": ['family', 'children', 'fun', 'young', 'happy', 'animation'],
-        multiplierArray: ['family', 'cartoon', 'kid', 'animat']
+        multiplierArray: ['family', 'cartoon', 'kid', 'animated']
     },
     "14": {
         "name": "Fantasy",
@@ -522,4 +474,5 @@ async function search(input) {
         }
     })
 }
+
 
