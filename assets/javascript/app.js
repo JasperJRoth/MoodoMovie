@@ -463,6 +463,14 @@ $(document).ready(function(){
         siteAuth.signUp(email, pass);
     });
 
+    $("#signupCancel").on("click", function(){
+        hideSignUp();
+    });
+
+    $("#loginCancel").on("click", function(){
+        hideSignIn();
+    });
+
     //checks if the user is authenticated
     firebase.auth().onAuthStateChanged(async function(user) {
         if (user) {
