@@ -41,7 +41,7 @@ function getWatchedListFromLocal(){
     if (typeof(Storage) !== "undefined") {
         if(localStorage.getItem("watched") !== null){
             data = JSON.parse(window.localStorage.getItem("watched"));
-            if(data.length ===0) data = [];
+            if(data === null || data.length === 0) data = [];
         }
     }
 
