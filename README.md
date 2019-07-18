@@ -12,4 +12,4 @@ searching through countless films so you don't have to.
 - Dan Proctor
 - Jasper Roth
 
-(View Deployment)[https://jasperjroth.github.io/MoodoMovie/]
+[View Deployment](https://jasperjroth.github.io/MoodoMovie/)
