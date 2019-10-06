@@ -6,6 +6,16 @@ MoodoMovie is a tool for discovering films that fit with your mood!
 Simply enter how you're feeling and MoodoMovie will do the rest,
 searching through countless films so you don't have to.
 
+### Technologies Used
+
+* HTML
+* CSS
+* Javascript
+* JQuery
+* AJAX
+* Firebase
+* Node.js
+
 ### Contributors
 - Carolina Cavalcanti
 - Sungjea Park
