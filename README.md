@@ -17,9 +17,9 @@ searching through countless films so you don't have to.
 * Node.js
 
 ### Contributors
-- Carolina Cavalcanti
-- Sungjea Park
-- Dan Proctor
-- Jasper Roth
+* Carolina Cavalcanti
+* Sungjea Park
+* Dan Proctor
+* Jasper Roth
 
 [View Deployment](https://jasperjroth.github.io/MoodoMovie/)
